@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聖團答題集快速查詢</title>
+<style>
+  *{
+    box-sizing:border-box;
+  }
+  body {
+    font-family: "Microsoft JhengHei", Arial, sans-serif;
+    background: linear-gradient(to right, #f0f4ff, #e6f0ff);
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #334;
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+  #search {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+  #results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  .item {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+  }
+  .name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #222;
+  }
+  .question {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #555;
+  }
+  .answer {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .answer[data-value="✅"] {
+    color: green;
+  }
+  .answer[data-value="❌"] {
+    color: red;
+  }
+</style>
+</head>
+<body>
+
+<h1>聖團答題集快速查詢</h1>
+<input type="text" id="search" placeholder="輸入關鍵字快速查詢...">
+<div id="results"></div>
+
+<script>
+  const quizData = [
+   {name:"你會不會突然的出現", question:"在街角的咖啡店"},
+   {name:"海鳥和魚相愛", question:"只是一場意外"},
+   {name:"不要問我太陽有多高", question:"我會告訴你我有多真"},
+   {name:"只要你一個眼神肯定", question:"我的愛就有意義"},
+   {name:"誰在用琵琶彈奏", question:"一曲東風破"},
+   {name:"越過山丘", question:"才發現無人等候"},
+   {name:"愛真的需要勇氣", question:"來面對流言蜚語"},
+   {name:"為你彈奏蕭邦的夜曲", question:"紀念我死去的愛情"},
+   {name:"雨一直下", question:"氣氛不算融洽"},
+   {name:"我送你離開 千里之外", question:"你無聲黑白"},
+   {name:"我一直有雙隱形的翅膀 帶我飛", question:"飛過絕望"},
+   {name:"雪花飄飄 北風蕭蕭", question:"天地一片蒼茫"},
+   {name:"讓我們蕩起雙槳", question:"小船兒推開波浪"},
+   {name:"只願得一人心", question:"白首不分離"},
+   {name:"即使有天開個唱 誰又要唱", question:"他不可到現場"},
+   {name:"愛要越挫越勇", question:"愛要肯定執著"},
+   {name:"你當我是浮誇吧", question:"誇張只因我很怕"},
+   {name:"當夢被埋在江南煙雨中", question:"心碎了才懂"},
+   {name:"當你老了", question:"頭髮白了"},
+   {name:"天青色等煙雨", question:"而我在等你"},
+   {name:"我曾經跨過山和大海", question:"也穿過人山人海"},
+   {name:"愛得痛了", question:"痛得哭了"},
+
+   {name:"你可知道你的名字", question:"解釋了我的一生"},
+   {name:"可惜不是你", question:"陪我到最後"},
+   {name:"路見不平一聲吼", question:"該出手時就出手"},
+   {name:"飛雪連天射白鹿", question:"笑書神俠倚碧鴛"},
+   {name:"苟全性命於亂世", question:"不求聞達於諸侯"},
+   {name:"欲窮千里目", question:"更上一層樓"},
+   {name:"問君能有幾多愁", question:"恰似一江春水向東流"},
+   {name:"執子之手", question:"與子偕老"},
+   {name:"那些年錯過的大雨", question:"那些年錯過的愛情"},
+   {name:"抽刀斷水水更流", question:"舉杯消愁愁更愁"},
+   {name:"相聚離開 都有時候", question:"沒有什麼會永垂不朽"},
+   {name:"菊花殘 滿地傷 下一句是?", question:"你的笑容已泛黃"},
+   {name:"近水樓台先得月 下一句?", question:"向陽花木易為春"},
+   {name:"青春如同奔流的江河", question:"一去不回來不及道別"},
+   {name:"再回首恍然如夢", question:"再回首我心依舊"},
+
+   {name:"我愛吾師 我更愛智慧", question:"蘇格拉底"},
+   {name:"1869年元素週期律公佈", question:"門捷列夫"},
+   {name:"圓舞曲之王&之父甚麼關係", question:"父子"},
+   {name:"霍金博士的電影", question:"愛的萬物論"},
+   {name:"霍金博士最著名的作品", question:"時間簡史"},
+   {name:"詩仙", question:"李白"},
+
+   {name:"亞洲的全稱", question:"亞細亞洲"},
+   {name:"羅浮宮博物館在哪個城市", question:"巴黎"},
+   {name:"黃河最終注入哪個海", question:"渤海"},
+   {name:"歌劇誕生於哪國", question:"義大利"},
+   {name:"教育王國", question:"以色列"},
+   {name:"太陽金字塔座落於", question:"墨西哥"},
+   {name:"世界上流經最多國家的河", question:"多瑙河"},
+   {name:"日本哪個城市與北京競爭申請2008奧運", question:"大阪"},
+   {name:"黃河流入什麼海", question:"渤海"},
+   {name:"三生三世十里桃花楊冪主演", question:"白淺"},
+   {name:"金屋藏嬌故事跟哪位皇帝有關", question:"漢武帝"},
+   {name:"誰嘗百草", question:"神農"},
+   {name:"中國 發行紙幣", question:"宋"},
+   {name:"破釜沉舟出自哪個戰爭", question:"鉅鹿之戰"},
+   {name:"戰國四公子中齊國的孟嘗君", question:"田文"},
+   {name:"本草綱目作者", question:"李時珍"},
+   {name:"世界上迄今保存最完整的一部成文法典", question:"漢摩拉比法典"},
+   {name:"虎門硝煙的領導人", question:"林則徐"},
+   {name:"絲綢之路的開闢可追溯到", question:"西漢"},
+   {name:"負荊請罪講的是廉頗和哪位丞相的故事", question:"藺相如"},
+   {name:"隋煬帝本名叫什麼", question:"楊廣"},
+   {name:"誰撞倒不周山", question:"共工"},
+   {name:"何時起對最高統治者稱王", question:"商"},
+   {name:"發表著名的鐵幕演說的是", question:"邱吉爾"},
+   {name:"中國奴隸制是什麼時期瓦解的", question:"春秋"},
+   {name:"埃及神話的太陽神", question:"拉"},
+   {name:"北歐狡詐之神", question:"洛基"},
+   {name:"西漢第一任皇帝", question:"劉邦"},
+   {name:"中國最早的中醫學專著", question:"黃帝內經"},
+   {name:"祖沖之是哪個時代的科學家", question:"南北朝"},
+
+   {name:"全職獵人的作者", question:"富堅義博"},
+   {name:"全職獵人中火紅眼最後一人", question:"酷拉皮卡"},
+   {name:"全職獵人中幻影旅團的標誌", question:"蜘蛛"},
+   {name:"灌籃高手自稱天才的人", question:"櫻木花道"},
+   {name:"火影忍者的主角", question:"漩渦鳴人"},
+   {name:"物語系列男主名字", question:"阿良良木曆"},
+   {name:"涼宮春日的憂鬱男主角名字", question:"虛"},
+   {name:"刀語男主角家傳流派", question:"虛刀流"},
+   {name:"江戶川柯南真正的名字", question:"工藤新一"},
+   {name:"送給路飛帽子的人綽號", question:"紅髮"},
+   {name:"庫洛魔法使女主角名為", question:"木之本櫻"},
+   {name:"夏目友人帳男主角", question:"夏目貴志"},
+   {name:"齊木楠雄的髮色", question:"粉紅色"},
+   {name:"銀魂主角", question:"坂田銀時"},
+   {name:"坂田銀時的佩刀叫做", question:"洞爺湖"},
+   {name:"犬夜叉的哥哥", question:"殺生丸"},
+   {name:"死神男主角", question:"黑崎一護"},
+   {name:"高達之父", question:"富野由悠季"},
+   {name:"爆漫王中負責作畫的", question:"真城最高"},
+   {name:"齊木楠雄最喜歡的甜品", question:"咖啡果凍"},
+   {name:"十二國記作者", question:"小野不由美"},
+   {name:"命運石之門男主角網名", question:"鳳凰院凶真"},
+   {name:"神劍闖江湖中緋村劍心流派", question:"飛天禦劍流"},
+   {name:"銀魂狂亂貴公子", question:"桂小太郎"},
+   {name:"蠟筆小新中小新全名", question:"野原新之助"},
+   {name:"從零開始的異世界生活中鬼族雙胞胎妹妹", question:"雷姆"},
+   {name:"鬼燈的冷徹的武器", question:"狼牙棒"},
+   {name:"某科學的超電磁炮的女主角", question:"御阪美琴"},
+
+   {name:"西遊記中的火焰山是今天的哪個地方", question:"吐魯番盆地"},
+   {name:"風雅頌中風代表", question:"國風"},
+   {name:"心比天高命比紙薄是紅樓夢誰的判詞", question:"晴雯"},
+   {name:"中國第一部得獎的電影", question:"漁光曲"},
+   {name:"潑水節是中國哪個少數民族", question:"傣族"},
+   {name:"霹靂布袋戲詩號半神半聖亦半仙是誰", question:"素還真"},
+   {name:"羊肉泡饃是哪個城市的食品", question:"西安"},
+   {name:"唯一能夠前後左右飛行的鳥", question:"蜂鳥"},
+   {name:"人體中最堅硬的器官", question:"牙齒"},
+   {name:"世上第一隻克隆羊", question:"多莉"},
+   {name:"玉米受潮致癌毒素", question:"黃麴黴毒素"},
+   {name:"命運交響曲是第幾交響曲", question:"第五交響曲"},
+   {name:"巴金家春秋合稱", question:"激流三部曲"},
+   {name:"三秋桂子十里荷花出自", question:"望海潮"},
+   {name:"北斗七星屬於哪個星座", question:"大熊星座"}
+  ];
+
+  const searchInput = document.getElementById('search');
+  const resultsDiv = document.getElementById('results');
+  // 用來提示「已複製內容」
+  function showToast(text){
+    const toast = document.createElement("div");
+    toast.innerText = "已複製: " + text;
+    toast.style.position = "fixed";
+    toast.style.bottom = "30px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.background = "#333";
+    toast.style.color = "#fff";
+    toast.style.padding = "10px 20px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "14px";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+
+    setTimeout(()=>toast.remove(),1000);
+  }
+  //複製文字到剪貼簿 (手機也能用)
+  function copyText(text){
+    const input = document.createElement("input");
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    input.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(input);
+  }
+  // 搜尋題目
+  function searchQuiz() {
+
+    // 取得搜尋框內容
+    const keyword = searchInput.value.trim();
+
+    resultsDiv.innerHTML = '';
+    if (!keyword) return;  // 沒輸入就不搜尋
+    const filtered = quizData.filter(q =>
+      q.name.includes(keyword) || q.question.includes(keyword)
+    );
+    filtered.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div class="name">${q.name}</div>
+        <div class="question">${q.question}</div>
+      `;
+
+      // 點整個框複製答案
+      div.addEventListener("click", () => {
+  	copyText(q.question);
+  	showToast(q.question);
+      });
+
+      resultsDiv.appendChild(div);
+    });
+  }
+
+
+  searchInput.addEventListener('input', searchQuiz);
+</script>
+
+</body>
+</html>
