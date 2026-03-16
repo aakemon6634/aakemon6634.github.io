@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>風國大腦題庫快速查詢</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  font-family:"Microsoft JhengHei", Arial, sans-serif;
+  background:linear-gradient(to right,#f0f4ff,#e6f0ff);
+  margin:0;
+  padding:20px;
+}
+
+h1{
+  text-align:center;
+  color:#334;
+  margin-bottom:20px;
+  font-size:28px;
+}
+
+/* 搜尋區 */
+.searchBox{
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.searchBox input{
+  width:100%;
+  padding:12px 15px;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 卡片 */
+#results{
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+  gap:15px;
+}
+
+.item{
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  transition:transform .2s, box-shadow .2s;
+}
+
+.item:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.15);
+}
+
+.type{
+  font-size:12px;
+  color:#888;
+  margin-bottom:5px;
+}
+
+.name{
+  font-weight:bold;
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+.question{
+  font-size:14px;
+  margin-bottom:8px;
+  color:#555;
+}
+
+.answer{
+  font-size:16px;
+  font-weight:bold;
+}
+
+.answer[data-value="✅"]{
+  color:green;
+}
+
+.answer[data-value="❌"]{
+  color:red;
+}
+.tags{
+  margin-bottom:20px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.tags button{
+  border:none;
+  padding:8px 14px;
+  border-radius:20px;
+  background:#4a7dff;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.2s;
+}
+.tags button:hover{
+  background:#2f5ee0;
+}
+.columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+#wrong,#correct{
+  display:grid;
+  gap:12px;
+}
+
+h2{
+  margin:10px 0;
+  font-size:20px;
+}
+.mapPopup{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.mapImage{
+  max-width:95%;
+  max-height:95%;
+  border-radius:10px;
+}
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  background:#333;
+  padding:10px;
+  display:flex;
+  gap:10px;
+  z-index:1000;
+}
+
+.navbar a{
+  color:white;
+  text-decoration:none;
+  padding:8px 14px;
+  background:#555;
+  border-radius:6px;
+}
+
+.navbar a:hover{
+  background:#777;
+}
+
+/* 內容往下移避免被蓋住 */
+body{
+  padding-top:60px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>風國大腦題庫快速查詢</h1>
+
+<div class="searchBox">
+	<input type="text" id="typeSearch" placeholder="分類(type)：npc / 遊戲 / 魂">
+	<input type="text" id="search" placeholder="題目 / 名稱 搜尋">
+</div>
+<div class="tags">
+	<button onclick="setType('npc')">NPC</button>
+	<button onclick="setType('遊戲')">遊戲</button>
+	<button onclick="setType('魂')">魂卡</button>
+	<button onclick="setType('動畫')">動畫</button>
+	<button onclick="setType('生物')">生物</button>
+	<button onclick="setType('人名')">人名</button>
+	<button onclick="setType('化學')">化學</button>
+	<button onclick="setType('醫學')">醫學</button>
+	<button onclick="setType('海')">海</button>
+	<button onclick="setType('食物')">食物</button>
+	<button onclick="setType('神話')">神話</button>
+	<button onclick="setType('地科')">地科</button>
+	<button onclick="setType('國家')">國家</button>
+
+
+	<button onclick="setType('')">空白</button>
+
+</div>
+<button onclick="showMap()">🗺️地圖</button>
+<div class="navbar">
+  <a href="https://aakemon6634.github.io/%E8%81%96%E5%9C%98%E5%95%8F%E7%AD%94.HTML">聖團答題</a>
+  <a href="map.html">風國大腦題庫</a>
+</div>
+<div id="mapPopup" class="mapPopup" onclick="closeMap()">
+  <img src="https://cdn.discordapp.com/attachments/1369303760991555716/1369303832450044034/image.png?ex=69b95612&is=69b80492&hm=e427b7697a09d1494ac4be3e94f38bda554846a9acfa9f1994df6291eae2f54f" class="mapImage" onclick="event.stopPropagation()">
+</div>
+<div class="columns">
+
+  <div>
+    <h2>❌ 錯誤題</h2>
+    <div id="wrong"></div>
+  </div>
+
+  <div>
+    <h2>✅ 正確題</h2>
+    <div id="correct"></div>
+  </div>
+
+</div>
+<script>
+
+const quizData = [
+	{type:"npc",name:"拉魯", question:"奪寶奇兵", answer:"✅"},
+	{type:"npc",name:"芭芭拉", question:"聖徒導師", answer:"✅"},
+        {type:"npc",name:"阿提亞", question:"秘寶任務傳送人", answer:"✅"},
+        {type:"npc",name:"神木鎮的托爾", question:"買火把", answer:"✅"},
+        {type:"npc",name:"神木鎮的南茜太太", question:"怕花粉", answer:"✅"},
+        {type:"npc",name:"教堂艾德文神父", question:"結婚", answer:"✅"},
+        {type:"npc",name:"教堂艾德文神父", question:"密友", answer:"❌"},
+        {type:"npc",name:"聖團的道格", question:"任命主戰菁英", answer:"✅"},
+        {type:"npc",name:"聖團的薇薇安", question:"勇者鬥惡龍", answer:"✅"},
+        {type:"npc",name:"羅傑", question:"裝備副本傳送人", answer:"❌"},
+
+        {type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
+        {type:"遊戲",name:"可使用忘憂果", question:"洗練守護的天生技能", answer:"✅"},
+        {type:"遊戲",name:"全身強化105級時", question:"紅色光芒", answer:"❌"},
+        {type:"遊戲",name:"使用妖精八音盒", question:"獲得彩螺", answer:"❌"},
+        {type:"遊戲",name:"使用夏日果汁", question:"守護獸提升等級", answer:"✅"},
+        {type:"遊戲",name:"補蛋網可以抓到", question:"閃守護", answer:"❌"},
+        {type:"遊戲",name:"補蛋網可以抓到", question:"金色守護", answer:"✅"},
+        {type:"遊戲",name:"補蛋網可以拿來", question:"捉嗅嗅", answer:"❌"},
+        {type:"遊戲",name:"裝備打孔", question:"鑲嵌魂卡", answer:"✅"},
+        {type:"遊戲",name:"魂卡秘境", question:"金色魂卡", answer:"✅"},
+        {type:"遊戲",name:"黎明盛典", question:"8顆魂珠", answer:"❌"},
+        {type:"遊戲",name:"護送任務", question:"妖精音樂盒", answer:"✅"},
+	{type:"遊戲",name:"炎術士可以使用", question:"冰風暴", answer:"✅"},
+        {type:"遊戲",name:"禦靈可以自由", question:"選擇召喚的顏色", answer:"❌"},
+        {type:"遊戲",name:"忍者不攻擊就可以", question:"一直隱身", answer:"❌"},
+	{type:"遊戲",name:"裝備秘境中", question:"70級金色", answer:"❌"},
+	{type:"遊戲",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
+    	{type:"遊戲",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
+
+        {type:"魂",name:"托雷希雅提供", question:"衝擊波", answer:"✅"},
+        {type:"魂",name:"米諾娃魂卡提供", question:"聖域之劍", answer:"✅"},
+        {type:"魂",name:"神櫻魂卡提供", question:"漫天飛花", answer:"❌"},
+        {type:"魂",name:"雪狼魂卡提供", question:"狼人", answer:"❌"},
+        {type:"魂",name:"雪緒魂卡提供", question:"冰封乾裡", answer:"❌"},
+        {type:"魂",name:"啾比魂卡提供", question:"啾力可出擊", answer:"✅"},
+        {type:"魂",name:"蝙蝠提供", question:"吸血", answer:"❌"},
+	{type:"魂",name:"傘蓋菇提供", question:"天降正義", answer:"✅"},
+
+        {type:"動畫",name:"七龍珠", question:"琪琪是孫悟空的妻子", answer:"✅"},
+        {type:"動畫",name:"火影忍者", question:"岸本齊史", answer:"✅"},
+        {type:"動畫",name:"名偵探柯南", question:"工藤新一", answer:"✅"},
+        {type:"動畫",name:"名偵探柯南沒有完結", question:"青山剛昌", answer:"✅"},
+        {type:"動畫",name:"在地下城尋求邂逅是否搞錯了什麼", question:"主角名字叫貝爾", answer:"✅"},
+        {type:"動畫",name:"死神漫畫已結束", question:"久保帶人", answer:"✅"},
+        {type:"動畫",name:"死神BLEACH", question:"夜神月", answer:"❌"},
+        {type:"動畫",name:"科學的超電磁砲", question:"白井黑子", answer:"❌"},
+        {type:"動畫",name:"航海王", question:"尾田榮一郎", answer:"✅"},
+        {type:"動畫",name:"機動戰士鋼彈SEED", question:"飛鳥真", answer:"❌"},
+        {type:"動畫",name:"鋼之煉金術士", question:"動畫於2005年首次上映", answer:"❌"},
+        {type:"動畫",name:"魔卡少女櫻", question:"「我代表月亮消滅你們」", answer:"❌"},
+	{type:"動畫",name:"JOJO星塵鬥士反派", question:"DIO", answer:"✅"},
+
+        {type:"人名",name:"北野武自導自演的電影", question:"《菊次郎之夏》", answer:"✅"},
+        {type:"人名",name:"李白 是唐代維達的。", question:"浪漫主義詩人", answer:"✅"},
+        {type:"人名",name:"杜甫 之手", question:"《無邊落木蕭蕭下》", answer:"✅"},
+        {type:"人名",name:"阿米爾·罕 主演", question:"《我和我的冠軍女兒》", answer:"✅"},
+        {type:"人名",name:"美國萊特兄弟發明", question:"飛機發明者", answer:"✅"},
+        {type:"人名",name:"哥白尼提出", question:"地心說", answer:"❌"},
+        {type:"人名",name:"姬昌 作者是", question:"《週易》", answer:"✅"},
+        {type:"人名",name:"梵谷 出生於芬蘭", question:"37歲的人生中留下無數畫作", answer:"❌"},
+        {type:"人名",name:"梵谷 的代表作品有", question:"《星月夜》", answer:"✅"},
+        {type:"人名",name:"莎士比亞 作者", question:"《哈姆雷特》", answer:"✅"},
+        {type:"人名",name:"莫內是法國畫派代表人物", question:"浪漫主義", answer:"❌"},
+        {type:"人名",name:"雅達利生產了", question:"第一台遊戲機", answer:"✅"},
+        {type:"人名",name:"達利 是", question:"《記憶的永恆》《一條哈巴狗》等", answer:"❌"},
+        {type:"人名",name:"達利是著名的西班牙畫家 因", question:"超現實主義作品而聞名", answer:"✅"},
+        {type:"人名",name:"歐陽修 作者", question:"《春江花月夜》", answer:"❌"},
+        {type:"人名",name:"蕭邦 作品。", question:"《命運交響曲》", answer:"❌"},
+        {type:"人名",name:"蕭邦是法國著名", question:"鋼琴家與作曲家", answer:"❌"},
+	{type:"人名",name:"亞當斯密", question:"《國富論》", answer:"✅"},
+	{type:"人名",name:"貝多芬", question:"《降E大調夜曲》", answer:"❌"},
+
+        {type:"化學",name:"地殼含量最多的金屬元素是。", question:"鋁", answer:"✅"},
+        {type:"化學",name:"密度最大的金屬", question:"鋨", answer:"✅"},
+        {type:"化學",name:"密度最大的金屬", question:"鋰", answer:"✅"},
+        {type:"化學",name:"孔徑最大的金屬", question:"金", answer:"❌"},
+        {type:"化學",name:"人體含量最高的金屬", question:"鈣", answer:"✅"},
+        {type:"化學",name:"「乾冰」是指", question:"固態上升", answer:"✅"},
+        {type:"化學",name:"臭氧可以用來", question:"給水消毒", answer:"✅"},
+	{type:"化學",name:"沙漠中植物體內含量最多的", question:"化合物是蛋白質。", answer:"❌"},
+
+	{type:"生物",name:"俄羅斯的國寶", question:"灰熊", answer:"❌"},
+        {type:"生物",name:"蚯蚓是", question:"雌雄同體", answer:"✅"},
+        {type:"生物",name:"吸蜜蜂鳥是世界上。", question:"最小的鳥", answer:"✅"},
+	{type:"生物",name:"浮游生物", question:"海洋中最多的生物", answer:"✅"},
+    	{type:"生物",name:"蜜蜂是世界上", question:"最小的鳥類", answer:"❌"},
+    	{type:"生物",name:"禿鷹 是白頭海鵰", question:"美國的國鳥", answer:"✅"},
+    	{type:"生物",name:"藍鯨", question:"世界上最大的哺乳動物", answer:"✅"},
+    	{type:"生物",name:"大象", question:"世界上最大的哺乳動物", answer:"❌"},
+    	{type:"生物",name:"旅鼠", question:"繁殖能力最強", answer:"✅"},
+    	{type:"生物",name:"蝙蝠是唯一", question:"會飛的哺乳動物", answer:"✅"},
+    	{type:"生物",name:"北極熊是", question:"德國的國寶動物", answer:"❌"},
+
+    	{type:"醫學",name:"胰島素", question:"可以降低血壓。", answer:"✅"},
+    	{type:"醫學",name:"三高", question:"指的是高血脂、高血壓、高血糖。", answer:"✅"},
+    	{type:"醫學",name:"肝臟", question:"人體最大的解毒器官是", answer:"✅"},
+	{type:"醫學",name:"真核細胞", question:"有染色體", answer:"✅"},
+
+    	{type:"海",name:"太平洋", question:"地球第一大洋。", answer:"✅"},
+    	{type:"海",name:"太平洋", question:"世界上島嶼最多的海洋", answer:"✅"},
+    	{type:"海",name:"北海", question:"世界上最大的海。", answer:"❌"},
+    	{type:"海",name:"多瑙河", question:"世界上最長的河流", answer:"❌"},
+    	{type:"海",name:"瑪律馬拉海", question:"世界最小的海", answer:"✅"},
+    	{type:"海",name:"蘇伊士運河", question:"屬於瑞士", answer:"❌"},
+
+    	{type:"食物",name:"世界3大飲料", question:"茶、咖啡和可樂", answer:"❌"},
+    	{type:"食物",name:"咖啡", question:"有一個品種", answer:"❌"},
+	{type:"食物",name:"巧克力", question:"發源義大利", answer:"❌"},
+	{type:"食物",name:"肯德基", question:"上校軍銜", answer:"✅"},
+	{type:"食物",name:"咖啡", question:"起源於埃塞俄比亞", answer:"✅"},
+
+
+    	{type:"神話",name:"波賽頓", question:"希臘神話-戰神", answer:"❌"},
+	{type:"神話",name:"雅典娜", question:"愛神", answer:"❌"},
+    
+    	{type:"地科",name:"木星", question:"太陽系中最大的行星", answer:"✅"},
+    	{type:"地科",name:"土星的", question:"密度比水小", answer:"✅"},
+    	{type:"地科",name:"目前地球上已知的最大隕石坑位於", question:"南極洲", answer:"❌"},
+   	{type:"地科",name:"琥珀", question:"屬於有機寶石", answer:"✅"},
+
+    	{name:"塔克拉瑪幹沙漠", question:"位於新疆南部", answer:"✅"},
+    	{name:"喬戈裡峰", question:"是世界第三大高峰", answer:"❌"},
+    	{name:"NBA歷史上最高的個人單場得分記錄", question:"是120分", answer:"❌"},
+	{name:"多曬太陽", question:"可治療白化病", answer:"❌"},
+	{name:"神木鎮", question:"地圖1-35級", answer:"❌"},
+	{name:"日陽森林", question:"地圖50-65級", answer:"❌"},
+	
+	{name:"雅達利", question:"第一台遊戲機", answer:"✅"},
+	{name:"浦普蒲公英", question:"風力", answer:"✅"},
+	{type:"國家",name:"《賽馬曲》", question:"法國國歌", answer:"✅"},
+ 	{type:"國家",name:"美國", question:"籃球運動", answer:"✅"},
+        {type:"國家",name:"美國發射了世界上第一顆", question:"人造衛星", answer:"❌"},
+        {type:"國家",name:"英國國歌", question:"《星光燦爛的旗幟》", answer:"❌"},
+        {type:"國家",name:"英國國歌", question:"《天佑女王》", answer:"✅"},
+        {type:"國家",name:"唐朝在隋朝前。", question:"", answer:"❌"},
+        {type:"國家",name:"義大利的", question:"佛羅倫斯", answer:"✅"},
+        {type:"國家",name:"韓國品牌", question:"LG", answer:"✅"},
+	{type:"國家",name:"五線譜", question:"法國人發明", answer:"❌"},
+	{name:"塑膠瓶", question:"海裡存在永久", answer:"❌"}
+
+
+];
+
+const searchInput = document.getElementById("search");
+const typeInput = document.getElementById("typeSearch");
+const wrongDiv = document.getElementById("wrong");
+const correctDiv = document.getElementById("correct");
+function searchQuiz(){
+
+const keyword = searchInput.value.trim();
+const typeKeyword = typeInput.value.trim();
+
+wrongDiv.innerHTML="";
+correctDiv.innerHTML="";
+
+if(!keyword && !typeKeyword) return;
+
+const filtered = quizData.filter(q=>{
+
+const matchType = !typeKeyword || (q.type && q.type.includes(typeKeyword));
+const matchKeyword = !keyword || q.name.includes(keyword) || q.question.includes(keyword);
+
+return matchType && matchKeyword;
+
+});
+
+filtered.forEach(q=>{
+
+const div=document.createElement("div");
+div.className="item";
+
+div.innerHTML=`
+<div class="type">${q.type || ""}</div>
+<div class="name">${q.name}</div>
+<div class="question">${q.question}</div>
+<div class="answer" data-value="${q.answer}">答案：${q.answer}</div>
+`;
+
+if(q.answer==="❌"){
+  wrongDiv.appendChild(div);
+}else{
+  correctDiv.appendChild(div);
+}
+});
+
+}
+
+searchInput.addEventListener("input",searchQuiz);
+typeInput.addEventListener("input",searchQuiz);
+function setType(type){
+  document.getElementById("typeSearch").value = type;
+  searchQuiz();
+}
+function showMap(){
+  document.getElementById("mapPopup").style.display="flex";
+}
+
+function closeMap(){
+  document.getElementById("mapPopup").style.display="none";
+}
+</script>
+
+</body>
+</html>
