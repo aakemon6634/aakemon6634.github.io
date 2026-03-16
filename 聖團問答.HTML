@@ -66,6 +66,35 @@
   .answer[data-value="❌"] {
     color: red;
   }
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  background:#333;
+  padding:10px;
+  display:flex;
+  gap:10px;
+  z-index:1000;
+}
+
+.navbar a{
+  color:white;
+  text-decoration:none;
+  padding:8px 14px;
+  background:#555;
+  border-radius:6px;
+}
+
+.navbar a:hover{
+  background:#777;
+}
+
+/* 內容往下移避免被蓋住 */
+body{
+  padding-top:60px;
+}
+
 </style>
 </head>
 <body>
@@ -73,6 +102,10 @@
 <h1>聖團答題集快速查詢</h1>
 <input type="text" id="search" placeholder="輸入關鍵字快速查詢...">
 <div id="results"></div>
+<div class="navbar">
+  <a href="https://aakemon6634.github.io/%E8%81%96%E5%9C%98%E5%95%8F%E7%AD%94.HTML">聖團答題</a>
+  <a href="https://aakemon6634.github.io/%E5%A4%A7%E8%85%A6%E9%A1%8C%E5%BA%AB.html">風國大腦題庫</a>
+</div>
 
 <script>
   const quizData = [
