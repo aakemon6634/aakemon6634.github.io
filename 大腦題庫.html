@@ -187,6 +187,7 @@ body{
 <div class="tags">
 	<button onclick="setType('npc')">NPC</button>
 	<button onclick="setType('遊戲')">遊戲</button>
+	<button onclick="setType('電玩')">電玩</button>
 	<button onclick="setType('魂')">魂卡</button>
 	<button onclick="setType('動畫')">動畫</button>
 	<button onclick="setType('生物')">生物</button>
@@ -238,7 +239,7 @@ const quizData = [
         {type:"npc",name:"聖團的薇薇安", question:"勇者鬥惡龍", answer:"✅"},
         {type:"npc",name:"羅傑", question:"裝備副本傳送人", answer:"❌"},
 
-        {type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
+     {type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
         {type:"遊戲",name:"可使用忘憂果", question:"洗練守護的天生技能", answer:"✅"},
         {type:"遊戲",name:"全身強化105級時", question:"紅色光芒", answer:"❌"},
         {type:"遊戲",name:"使用妖精八音盒", question:"獲得彩螺", answer:"❌"},
@@ -254,9 +255,11 @@ const quizData = [
         {type:"遊戲",name:"禦靈可以自由", question:"選擇召喚的顏色", answer:"❌"},
         {type:"遊戲",name:"忍者不攻擊就可以", question:"一直隱身", answer:"❌"},
 		{type:"遊戲",name:"裝備秘境中", question:"70級金色", answer:"❌"},
-		{type:"遊戲",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
-    	{type:"遊戲",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
 		{type:"遊戲",name:"魂卡強化", question:"需要消耗瑪娜", answer:"✅"},
+	
+		{type:"電玩",name:"塞爾達傳說:曠野之息", question:"扮演的角色是塞爾達", answer:"❌"},
+		{type:"電玩",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
+		{type:"電玩",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
 
 
         {type:"魂",name:"托雷希雅提供", question:"衝擊波", answer:"✅"},
@@ -306,7 +309,7 @@ const quizData = [
 		{type:"人名",name:"亞當斯密", question:"《國富論》", answer:"✅"},
 		{type:"人名",name:"貝多芬", question:"《降E大調夜曲》", answer:"❌"},
 		{type:"人名",name:"童話《賣火柴的小女孩》", question:"格林兄弟的作品。", answer:"❌"},
-
+		{type:"人名",name:"現代藝術之父", question:"塞尚", answer:"✅"},
 
 
         {type:"化學",name:"地殼含量最多的金屬元素是。", question:"鋁", answer:"✅"},
