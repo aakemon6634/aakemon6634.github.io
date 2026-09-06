@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>圖片展示</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+h1 {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 28px;
+  color:White;
+}
+body{
+  margin:0;
+  padding:20px;
+  font-family:"Microsoft JhengHei",Arial,sans-serif;
+  background:#171525;
+}
+
+/* 圖片展示區 */
+
+.imageGrid{
+  max-width:1400px;
+  margin:auto;
+
+  display:grid;
+
+  /* 一行3張 */
+  grid-template-columns:repeat(3,1fr);
+
+  gap:20px;
+}
+
+/* 圖片 */
+
+.galleryImage{
+  width:100%;
+  height:250px;
+
+  object-fit:contain;
+
+  background:#211e2b;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+  border-radius:10px;
+}
+
+.galleryImage:hover{
+  transform:scale(1.03);
+}
+
+
+/* 放大圖片 */
+
+.imageViewer{
+
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,.9);
+
+  z-index:9999;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  cursor:pointer;
+}
+
+.viewerImage{
+
+  max-width:95%;
+  max-height:95%;
+
+  object-fit:contain;
+
+  border-radius:10px;
+
+  cursor:default;
+}
+
+/* 手機 */
+
+@media(max-width:600px){
+
+  body{
+    padding:10px;
+  }
+
+  .imageGrid{
+
+    /* 手機一行2張 */
+    grid-template-columns:repeat(2,1fr);
+
+    gap:8px;
+  }
+
+  .galleryImage{
+    height:180px;
+  }
+
+}
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =========================
+     圖片展示
+========================= -->
+<h1>🖼️ 圖片圖鑑</h1>
+<div id="imageGrid" class="imageGrid"></div>
+
+
+<!-- =========================
+     圖片放大查看
+========================= -->
+
+<div
+  id="imageViewer"
+  class="imageViewer"
+  onclick="closeImage()"
+>
+
+  <img
+    id="viewerImage"
+    class="viewerImage"
+    onclick="event.stopPropagation()"
+  >
+
+</div>
+
+
+<script>
+
+/* =========================
+   圖片資料
+========================= */
+
+const images = [
+
+  "file:///C:/Users/KHUser/Desktop/555.png",
+
+  "file:///C:/Users/KHUser/Desktop/555.png",
+
+  "https://你的圖片網址/image3.png",
+
+  "https://你的圖片網址/image4.png",
+
+  "https://你的圖片網址/image5.png",
+
+  "https://你的圖片網址/image6.png"
+
+];
+
+
+/* =========================
+   顯示圖片
+========================= */
+
+const imageGrid =
+  document.getElementById("imageGrid");
+
+
+images.forEach(src => {
+
+  const img =
+    document.createElement("img");
+
+  img.className="galleryImage";
+
+  img.src=src;
+
+  img.onclick=()=>{
+
+    showImage(src);
+
+  };
+
+  imageGrid.appendChild(img);
+
+});
+
+
+/* =========================
+   放大圖片
+========================= */
+
+function showImage(src){
+
+  const viewer =
+    document.getElementById("imageViewer");
+
+  const image =
+    document.getElementById("viewerImage");
+
+  image.src=src;
+
+  viewer.style.display="flex";
+
+}
+
+
+/* =========================
+   關閉
+========================= */
+
+function closeImage(){
+
+  document.getElementById(
+    "imageViewer"
+  ).style.display="none";
+
+}
+
+
+/* ESC 關閉 */
+
+document.addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key==="Escape"){
+
+      closeImage();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+
+</html>
