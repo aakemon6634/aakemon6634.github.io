@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>風國大腦題庫快速查詢</title>
+/* 暫定版20260517 */
 
 <style>
 
@@ -75,16 +76,15 @@ h1{
 }
 
 .question{
-  font-size:24px;
-  margin-bottom:8px;
+  font-size:20px;
   color:#555;
+  display:inline;
 }
 
 .answer{
-  font-size:16px;
-  font-weight:bold;
+  display:inline;
+  margin-left:10px;
 }
-
 .answer[data-value="✅"]{
   color:green;
 }
@@ -194,14 +194,13 @@ body{
 	<button onclick="setType('人名')">人名</button>
 	<button onclick="setType('化學')">化學</button>
 	<button onclick="setType('醫學')">醫學</button>
-	<button onclick="setType('海')">海</button>
+	<button onclick="setType('海')">海/河</button>
 	<button onclick="setType('食物')">食物</button>
 	<button onclick="setType('神話')">神話</button>
 	<button onclick="setType('地科')">地科</button>
 	<button onclick="setType('國家')">國家</button>
 	<button onclick="setType('地理')">地理</button>
 	<button onclick="setType('花')">花</button>
-
 
 
 	<button onclick="setType('')">空白</button>
@@ -211,7 +210,7 @@ body{
 <div class="navbar">
   <a href="https://aakemon6634.github.io/%E8%81%96%E5%9C%98%E5%95%8F%E7%AD%94.HTML">聖團答題</a>
   <a href="https://aakemon6634.github.io/%E5%A4%A7%E8%85%A6%E9%A1%8C%E5%BA%AB.html">風國大腦題庫</a>
-  <a href="https://aakemon6634.github.io/%E8%AD%B7%E9%80%81%E6%98%8E%E4%BF%A1%E7%89%87%E5%9C%96%E9%91%91.html">護送明信片圖鑑</a>
+<a href="https://aakemon6634.github.io/%E8%AD%B7%E9%80%81%E6%98%8E%E4%BF%A1%E7%89%87%E5%9C%96%E9%91%91.html">護送明信片圖鑑</a>
 </div>
 <div id="mapPopup" class="mapPopup" onclick="closeMap()">
   <img src="https://aakemon6634.github.io/image.png" class="mapImage" onclick="event.stopPropagation()">
@@ -232,50 +231,52 @@ body{
 <script>
 
 const quizData = [
-		{type:"npc",name:"拉魯", question:"奪寶奇兵", answer:"✅"},
-		{type:"npc",name:"芭芭拉", question:"聖徒導師", answer:"✅"},
-  	    {type:"npc",name:"阿提亞", question:"秘寶任務傳送人", answer:"✅"},
+	{type:"npc",name:"拉魯", question:"奪寶奇兵", answer:"✅"},
+	{type:"npc",name:"芭芭拉", question:"聖徒導師", answer:"✅"},
+        {type:"npc",name:"阿提亞", question:"秘寶任務傳送人", answer:"✅"},
         {type:"npc",name:"神木鎮的托爾", question:"買火把", answer:"✅"},
         {type:"npc",name:"神木鎮的南茜太太", question:"怕花粉", answer:"✅"},
         {type:"npc",name:"教堂艾德文神父", question:"結婚", answer:"✅"},
+        {type:"npc",name:"教堂艾德文神父", question:"密友", answer:"❌"},
         {type:"npc",name:"聖團的道格", question:"任命主戰菁英", answer:"✅"},
         {type:"npc",name:"聖團的薇薇安", question:"勇者鬥惡龍", answer:"✅"},
-		{type:"npc",name:"教堂艾德文神父", question:"密友", answer:"❌"},
         {type:"npc",name:"羅傑", question:"裝備副本傳送人", answer:"❌"},
 
+        {type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
         {type:"遊戲",name:"可使用忘憂果", question:"洗練守護的天生技能", answer:"✅"},
-	    {type:"遊戲",name:"使用夏日果汁", question:"守護獸提升等級", answer:"✅"},
-		{type:"遊戲",name:"補蛋網可以抓到", question:"金色守護", answer:"✅"},
-		{type:"遊戲",name:"裝備打孔", question:"鑲嵌魂卡", answer:"✅"},
-        {type:"遊戲",name:"魂卡秘境", question:"金色魂卡", answer:"✅"},
-	    {type:"遊戲",name:"護送任務", question:"妖精音樂盒", answer:"✅"},
-		{type:"遊戲",name:"炎術士可以使用", question:"冰風暴", answer:"✅"},
-		{type:"遊戲",name:"魂卡強化", question:"需要消耗瑪娜", answer:"✅"},
-		{type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
         {type:"遊戲",name:"全身強化105級時", question:"紅色光芒", answer:"❌"},
         {type:"遊戲",name:"使用妖精八音盒", question:"獲得彩螺", answer:"❌"},
+        {type:"遊戲",name:"使用夏日果汁", question:"守護獸提升等級", answer:"✅"},
         {type:"遊戲",name:"補蛋網可以抓到", question:"閃守護", answer:"❌"},
+        {type:"遊戲",name:"補蛋網可以抓到", question:"金色守護", answer:"✅"},
         {type:"遊戲",name:"補蛋網可以拿來", question:"捉嗅嗅", answer:"❌"},
+        {type:"遊戲",name:"裝備打孔", question:"鑲嵌魂卡", answer:"✅"},
+        {type:"遊戲",name:"魂卡秘境", question:"金色魂卡", answer:"✅"},
         {type:"遊戲",name:"黎明盛典", question:"8顆魂珠", answer:"❌"},
+        {type:"遊戲",name:"護送任務", question:"妖精音樂盒", answer:"✅"},
+	{type:"遊戲",name:"炎術士可以使用", question:"冰風暴", answer:"✅"},
         {type:"遊戲",name:"禦靈可以自由", question:"選擇召喚的顏色", answer:"❌"},
         {type:"遊戲",name:"忍者不攻擊就可以", question:"一直隱身", answer:"❌"},
-		{type:"遊戲",name:"裝備秘境中", question:"70級金色", answer:"❌"},
-		
-		{type:"魂",name:"托雷希雅提供", question:"衝擊波", answer:"✅"},
+	{type:"遊戲",name:"裝備秘境中", question:"70級金色", answer:"❌"},
+	{type:"遊戲",name:"魂卡強化", question:"需要消耗瑪娜", answer:"✅"},
+	
+	{type:"電玩",name:"塞爾達傳說:曠野之息", question:"扮演的角色是塞爾達", answer:"❌"},
+	{type:"電玩",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
+	{type:"電玩",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
+
+        {type:"魂",name:"托雷希雅提供", question:"衝擊波", answer:"✅"},
         {type:"魂",name:"米諾娃魂卡提供", question:"聖域之劍", answer:"✅"},
-		{type:"魂",name:"啾比魂卡提供", question:"啾力可出擊", answer:"✅"},
-		{type:"魂",name:"傘蓋菇提供", question:"天降正義", answer:"✅"},
-		{type:"魂",name:"火焰菇魂卡提供", question:"定時炸彈", answer:"✅"},
         {type:"魂",name:"神櫻魂卡提供", question:"漫天飛花", answer:"❌"},
         {type:"魂",name:"雪狼魂卡提供", question:"狼人", answer:"❌"},
         {type:"魂",name:"雪緒魂卡提供", question:"冰封乾裡", answer:"❌"},
+        {type:"魂",name:"啾比魂卡提供", question:"啾力可出擊", answer:"✅"},
         {type:"魂",name:"蝙蝠提供", question:"吸血", answer:"❌"},
-		{type:"魂",name:"蕾拉魂卡提供", question:"魅惑技能", answer:"❌"},
+	{type:"魂",name:"傘蓋菇提供", question:"天降正義", answer:"✅"},
+	{type:"魂",name:"蕾拉魂卡提供", question:"魅惑技能", answer:"❌"},
+	{type:"魂",name:"火焰菇魂卡提供", question:"定時炸彈", answer:"✅"},
 
-		{type:"電玩",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
-		{type:"電玩",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
-		{type:"電玩",name:"塞爾達傳說:曠野之息", question:"扮演的角色是塞爾達", answer:"❌"},
-		
+
+
         {type:"動畫",name:"七龍珠", question:"琪琪是孫悟空的妻子", answer:"✅"},
         {type:"動畫",name:"火影忍者", question:"岸本齊史", answer:"✅"},
         {type:"動畫",name:"名偵探柯南", question:"工藤新一", answer:"✅"},
@@ -288,127 +289,137 @@ const quizData = [
         {type:"動畫",name:"機動戰士鋼彈SEED", question:"飛鳥真", answer:"❌"},
         {type:"動畫",name:"鋼之煉金術士", question:"動畫於2005年首次上映", answer:"❌"},
         {type:"動畫",name:"魔卡少女櫻", question:"「我代表月亮消滅你們」", answer:"❌"},
-		{type:"動畫",name:"JOJO星塵鬥士反派", question:"DIO", answer:"✅"},
-		{type:"動畫",name:"空條承太郎替身", question:"世界", answer:"❌"},
-		{type:"動畫",name:"《鋼之煉金術士》主角兄弟中的哥哥", question:"愛德華·艾爾利克", answer:"✅"},
-		{type:"動畫",name:"《機動戰士高達》創始人", question:"富野由悠季", answer:"✅"},
+	{type:"動畫",name:"JOJO星塵鬥士反派", question:"DIO", answer:"✅"},
+	{type:"動畫",name:"空條承太郎替身", question:"世界", answer:"❌"},
+	{type:"動畫",name:"《鋼之煉金術士》主角兄弟中的哥哥", question:"愛德華·艾爾利克", answer:"✅"},
+	{type:"動畫",name:"《機動戰士高達》創始人", question:"富野由悠季", answer:"✅"},
 
 
-        {type:"人名",name:"北野武自導自演的電影", question:"《菊次郎之夏》", answer:"✅"},
-        {type:"人名",name:"李白 是唐代維達的。", question:"浪漫主義詩人", answer:"✅"},
-        {type:"人名",name:"杜甫 之手", question:"《無邊落木蕭蕭下》", answer:"✅"},
-        {type:"人名",name:"阿米爾·罕 主演", question:"《我和我的冠軍女兒》", answer:"✅"},
-        {type:"人名",name:"美國萊特兄弟發明", question:"飛機發明者", answer:"✅"},
-        {type:"人名",name:"哥白尼提出", question:"地心說", answer:"❌"},
-        {type:"人名",name:"姬昌 作者是", question:"《週易》", answer:"✅"},
-        {type:"人名",name:"梵谷 出生於芬蘭", question:"37歲的人生中留下無數畫作", answer:"❌"},
-        {type:"人名",name:"梵谷 的代表作品有", question:"《星月夜》", answer:"✅"},
-        {type:"人名",name:"莎士比亞 作者", question:"《哈姆雷特》", answer:"✅"},
-        {type:"人名",name:"莫內是法國畫派代表人物", question:"浪漫主義", answer:"❌"},
-        {type:"人名",name:"雅達利生產了", question:"第一台遊戲機", answer:"✅"},
-        {type:"人名",name:"達利 是", question:"《記憶的永恆》《一條哈巴狗》等", answer:"❌"},
-        {type:"人名",name:"達利是著名的西班牙畫家 因", question:"超現實主義作品而聞名", answer:"✅"},
-        {type:"人名",name:"歐陽修 作者", question:"《春江花月夜》", answer:"❌"},
-        {type:"人名",name:"蕭邦 作品。", question:"《命運交響曲》", answer:"❌"},
-        {type:"人名",name:"蕭邦是法國著名", question:"鋼琴家與作曲家", answer:"❌"},
-		{type:"人名",name:"亞當斯密", question:"《國富論》", answer:"✅"},
-		{type:"人名",name:"貝多芬", question:"《降E大調夜曲》", answer:"❌"},
-		{type:"人名",name:"童話《賣火柴的小女孩》", question:"格林兄弟的作品。", answer:"❌"},
-		{type:"人名",name:"現代藝術之父", question:"塞尚", answer:"✅"},
-		{type:"人名",name:"蕭邦", question:"波蘭著名鋼琴家", answer:"✅"},
-		{type:"人名",name:"《演員的自我修養》", question:"斯坦尼斯拉夫斯基創作", answer:"✅"},
-
-
-
-
-        {type:"化學",name:"地殼含量最多的金屬元素是。", question:"鋁", answer:"✅"},
-        {type:"化學",name:"密度最大的金屬", question:"鋨", answer:"✅"},
-        {type:"化學",name:"密度最大的金屬", question:"鋰", answer:"✅"},
-        {type:"化學",name:"孔徑最大的金屬", question:"金", answer:"❌"},
-        {type:"化學",name:"人體含量最高的金屬", question:"鈣", answer:"✅"},
-        {type:"化學",name:"「乾冰」是指", question:"固態上升", answer:"✅"},
-		{type:"化學",name:"乾冰", question:"指的是固態二氧化碳", answer:"✅"},
-        {type:"化學",name:"臭氧可以用來", question:"給水消毒", answer:"✅"},
-		{type:"化學",name:"沙漠中植物體內含量最多的", question:"化合物是蛋白質。", answer:"❌"},
-		{type:"化學",name:"空氣中含量最多的氣體", question:"氧氣", answer:"❌"},
-		{type:"化學",name:"金屬鈉遇水會", question:"發生化學性爆炸", answer:"✅"},
+{type:"人名",name:"阿米爾·罕", question:"《我和我的冠軍女兒》", answer:"✅"},
+{type:"人名",name:"亞當斯密", question:"《國富論》", answer:"✅"},
+{type:"人名",name:"北野武自", question:"《菊次郎之夏》", answer:"✅"},
+{type:"人名",name:"杜甫", question:"《無邊落木蕭蕭下》", answer:"✅"},
+{type:"人名",name:"李白", question:"是唐代維達的浪漫主義詩人", answer:"✅"},
+{type:"人名",name:"姬昌", question:"《週易》", answer:"✅"},
+{type:"人名",name:"莎士比亞", question:"《哈姆雷特》", answer:"✅"},
+{type:"人名",name:"梵谷", question:"《星月夜》", answer:"✅"},
+{type:"人名",name:"萊特兄弟", question:"飛機發明者", answer:"✅"},
+{type:"人名",name:"達利", question:"是著名的西班牙畫家超現實主義作品而聞名", answer:"✅"},
+{type:"人名",name:"蕭邦", question:"波蘭著名鋼琴家", answer:"✅"},
+{type:"人名",name:"塞尚", question:"現代藝術之父", answer:"✅"},
+{type:"人名",name:"斯坦尼斯拉夫斯基", question:"《演員的自我修養》", answer:"✅"},
+{type:"人名",name:"雅達利", question:"第一台遊戲機", answer:"✅"},
+{type:"人名",name:"格林兄弟", question:"童話《賣火柴的小女孩》。", answer:"❌"},
+{type:"人名",name:"莫內", question:"是法國畫派代表人物浪漫主義", answer:"❌"},
+{type:"人名",name:"梵谷", question:"37歲的人生中留下無數畫作", answer:"❌"},
+{type:"人名",name:"達利", question:"《記憶的永恆》《一條哈巴狗》等", answer:"❌"},
+{type:"人名",name:"歐陽修", question:"《春江花月夜》", answer:"❌"},
+{type:"人名",name:"蕭邦", question:"鋼琴家與作曲家", answer:"❌"},
+{type:"人名",name:"蕭邦。", question:"《命運交響曲》", answer:"❌"},
+{type:"人名",name:"貝多芬", question:"《降E大調夜曲》", answer:"❌"},
+{type:"人名",name:"愛因斯坦", question:"最先發現了白色光的組成", answer:"❌"},
 
 
 
-		{type:"生物",name:"俄羅斯的國寶", question:"灰熊", answer:"❌"},
-        {type:"生物",name:"蚯蚓是", question:"雌雄同體", answer:"✅"},
-        {type:"生物",name:"吸蜜蜂鳥是世界上。", question:"最小的鳥", answer:"✅"},
-		{type:"生物",name:"浮游生物", question:"海洋中最多的生物", answer:"✅"},
-    	{type:"生物",name:"蜜蜂是世界上", question:"最小的鳥類", answer:"❌"},
-    	{type:"生物",name:"禿鷹 是白頭海鵰", question:"美國的國鳥", answer:"✅"},
-    	{type:"生物",name:"藍鯨", question:"世界上最大的哺乳動物", answer:"✅"},
-    	{type:"生物",name:"大象", question:"世界上最大的哺乳動物", answer:"❌"},
-    	{type:"生物",name:"旅鼠", question:"繁殖能力最強", answer:"✅"},
-    	{type:"生物",name:"蝙蝠是唯一", question:"會飛的哺乳動物", answer:"✅"},
-    	{type:"生物",name:"北極熊是", question:"德國的國寶動物", answer:"❌"},
-		{type:"生物",name:"企鵝", question:"5月產卵", answer:"✅"},
-		{type:"生物",name:"蚊子", question:"有兩對翅膀", answer:"❌"},
 
+{type:"化學",name:"鋁", question:"地殼含量最多的金屬元素", answer:"✅"},
+{type:"化學",name:"鋨", question:"密度最大的金屬", answer:"✅"},
+{type:"化學",name:"鈉", question:"遇水會發生化學性爆炸", answer:"✅"},
+{type:"化學",name:"鈣", question:"人體含量最高的金屬", answer:"✅"},
+{type:"化學",name:"乾冰", question:"固態上升", answer:"✅"},
+{type:"化學",name:"乾冰", question:"指的是固態二氧化碳", answer:"✅"},
+{type:"化學",name:"臭氧", question:"可以用來給水消毒", answer:"✅"},
+{type:"化學",name:"化合物是蛋白質", question:"沙漠中植物體內含量最多的。", answer:"❌"},
+{type:"化學",name:"氧氣", question:"空氣中含量最多的氣體", answer:"❌"},
+{type:"化學",name:"金", question:"孔徑最大的金屬", answer:"❌"},
 
+{type:"生物",name:"大象", question:"世界上最大的哺乳動物", answer:"❌"},
+{type:"生物",name:"北極熊", question:"德國的國寶動物", answer:"❌"},
+{type:"生物",name:"灰熊", question:"俄羅斯的國寶", answer:"❌"},
+{type:"生物",name:"蚊子", question:"有兩對翅膀", answer:"❌"},
+{type:"生物",name:"蜜蜂", question:"是世界上最小的鳥類", answer:"❌"},
+
+{type:"生物",name:"熊貓", question:"是中國的國寶動物", answer:"✅"},
+{type:"生物",name:"企鵝", question:"5月產卵", answer:"✅"},
+{type:"生物",name:"鯊魚", question:"是胎生動物", answer:"✅"},
+{type:"生物",name:"吸蜜蜂鳥", question:"是世界上最小的鳥", answer:"✅"},
+{type:"生物",name:"浮游生物", question:"海洋中最多的生物", answer:"✅"},
+{type:"生物",name:"旅鼠", question:"繁殖能力最強", answer:"✅"},
+{type:"生物",name:"禿鷹", question:"美國的國鳥", answer:"✅"},
+{type:"生物",name:"蚯蚓", question:"雌雄同體", answer:"✅"},
+{type:"生物",name:"蝙蝠", question:"是唯一會飛的哺乳動物", answer:"✅"},
+{type:"生物",name:"藍鯨", question:"世界上最大的哺乳動物", answer:"✅"},
+{type:"生物",name:"浦普蒲公英", question:"風力", answer:"✅"},
 
 
     	{type:"醫學",name:"胰島素", question:"可以降低血壓。", answer:"✅"},
     	{type:"醫學",name:"三高", question:"指的是高血脂、高血壓、高血糖。", answer:"✅"},
     	{type:"醫學",name:"肝臟", question:"人體最大的解毒器官是", answer:"✅"},
-		{type:"醫學",name:"真核細胞", question:"有染色體", answer:"✅"},
-		{type:"醫學",name:"缺鉀會導致", question:"甲狀腺疾病", answer:"❌"},
+	{type:"醫學",name:"真核細胞", question:"有染色體", answer:"✅"},
+	{type:"醫學",name:"缺鉀會導致", question:"甲狀腺疾病", answer:"❌"},
+	{type:"醫學",name:"多曬太陽", question:"可治療白化病", answer:"❌"},
 
 
-    	{type:"海",name:"太平洋", question:"地球第一大洋。", answer:"✅"},
-    	{type:"海",name:"太平洋", question:"世界上島嶼最多的海洋", answer:"✅"},
-    	{type:"海",name:"北海", question:"世界上最大的海。", answer:"❌"},
-    	{type:"海",name:"多瑙河", question:"世界上最長的河流", answer:"❌"},
-    	{type:"海",name:"瑪律馬拉海", question:"世界最小的海", answer:"✅"},
-    	{type:"海",name:"蘇伊士運河", question:"屬於瑞士", answer:"❌"},
-		{type:"海",name:"死海是世界上最", question:"低的湖泊", answer:"✅"},
+{type:"海",name:"太平洋", question:"地球第一大洋。", answer:"✅"},
+{type:"海",name:"太平洋", question:"世界上島嶼最多的海洋", answer:"✅"},
+{type:"海",name:"瑪律馬拉海", question:"世界最小的海", answer:"✅"},
+{type:"海",name:"死海", question:"是世界上最低的湖泊", answer:"✅"},
+{type:"海",name:"北海", question:"世界上最大的海。", answer:"❌"},
+{type:"海",name:"多瑙河", question:"世界上最長的河流", answer:"❌"},
+{type:"海",name:"蘇伊士運河", question:"屬於瑞士", answer:"❌"},
+	
 
     	{type:"食物",name:"世界3大飲料", question:"茶、咖啡和可樂", answer:"❌"},
     	{type:"食物",name:"咖啡", question:"有一個品種", answer:"❌"},
-		{type:"食物",name:"巧克力", question:"發源義大利", answer:"❌"},
-		{type:"食物",name:"肯德基", question:"上校軍銜", answer:"✅"},
-		{type:"食物",name:"咖啡", question:"起源於埃塞俄比亞", answer:"✅"},
+	{type:"食物",name:"巧克力", question:"發源義大利", answer:"❌"},
+	{type:"食物",name:"肯德基", question:"上校軍銜", answer:"✅"},
+	{type:"食物",name:"咖啡", question:"起源於埃塞俄比亞", answer:"✅"},
 
 
     	{type:"神話",name:"波賽頓", question:"希臘神話-戰神", answer:"❌"},
-		{type:"神話",name:"雅典娜", question:"愛神", answer:"❌"},
+	{type:"神話",name:"雅典娜", question:"愛神", answer:"❌"},
     
     	{type:"地科",name:"木星", question:"太陽系中最大的行星", answer:"✅"},
     	{type:"地科",name:"土星的", question:"密度比水小", answer:"✅"},
-    	{type:"地科",name:"目前地球上已知的最大隕石坑位於", question:"南極洲", answer:"❌"},
-  	 	{type:"地科",name:"琥珀", question:"屬於有機寶石", answer:"✅"},
+   	{type:"地科",name:"琥珀", question:"屬於有機寶石", answer:"✅"},
+{type:"地科",name:"真空", question:"中無法傳遞聲音", answer:"✅"},
+{type:"地科",name:"目前地球上已知的最大隕石坑位於", question:"南極洲", answer:"❌"},
 
-    	{name:"塔克拉瑪幹沙漠", question:"位於新疆南部", answer:"✅"},
-    	{name:"喬戈裡峰", question:"是世界第三大高峰", answer:"❌"},
+
+
+    	
+    	
     	{name:"NBA歷史上最高的個人單場得分記錄", question:"是120分", answer:"❌"},
-		{name:"多曬太陽", question:"可治療白化病", answer:"❌"},
-		{name:"神木鎮", question:"地圖1-35級", answer:"❌"},
-		{name:"日陽森林", question:"地圖50-65級", answer:"❌"},
 	
-		{name:"雅達利", question:"第一台遊戲機", answer:"✅"},
-		{name:"浦普蒲公英", question:"風力", answer:"✅"},
-		{type:"國家",name:"《馬賽曲》", question:"法國國歌", answer:"✅"},
- 		{type:"國家",name:"美國", question:"籃球運動", answer:"✅"},
-        {type:"國家",name:"美國發射了世界上第一顆", question:"人造衛星", answer:"❌"},
-        {type:"國家",name:"英國國歌", question:"《星光燦爛的旗幟》", answer:"❌"},
-        {type:"國家",name:"英國國歌", question:"《天佑女王》", answer:"✅"},
-        {type:"國家",name:"唐朝在隋朝前。", question:"", answer:"❌"},
-        {type:"國家",name:"義大利的", question:"佛羅倫斯", answer:"✅"},
-        {type:"國家",name:"韓國品牌", question:"LG", answer:"✅"},
-		{type:"國家",name:"五線譜", question:"法國人發明", answer:"❌"},
-		{type:"國家",name:"比薩斜塔", question:"澳大利亞地標之一", answer:"❌"},
-		{type:"國家",name:"2000年夏季奧運會", question:"在悉尼舉行的", answer:"✅"},
+	{name:"神木鎮", question:"地圖1-35級", answer:"❌"},
+	{name:"日陽森林", question:"地圖50-65級", answer:"❌"},
 	
-		{type:"地理",name:"中國是全球領土面積", question:"最大的國家", answer:"❌"},
+	
+	
+{type:"國家",name:"2000年夏季奧運會", question:"在悉尼舉行的", answer:"✅"},
+{type:"國家",name:"《馬賽曲》", question:"法國國歌", answer:"✅"},
+{type:"國家",name:"美國", question:"籃球運動", answer:"✅"},
+{type:"國家",name:"英國國歌", question:"《天佑女王》", answer:"✅"},
+{type:"國家",name:"義大利的", question:"佛羅倫斯", answer:"✅"},
+{type:"國家",name:"韓國品牌", question:"LG", answer:"✅"},
+{type:"國家",name:"五線譜", question:"法國人發明", answer:"❌"},
+{type:"國家",name:"比薩斜塔", question:"澳大利亞地標之一", answer:"❌"},
+{type:"國家",name:"唐朝在隋朝前。", question:"", answer:"❌"},
+{type:"國家",name:"美國發射了世界上第一顆", question:"人造衛星", answer:"❌"},
+{type:"國家",name:"英國國歌", question:"《星光燦爛的旗幟》", answer:"❌"},
+	
+	{type:"地理",name:"中國是全球領土面積", question:"最大的國家", answer:"❌"},
+	{type:"地理",name:"喬戈裡峰", question:"是世界第三大高峰", answer:"❌"},
+	{type:"地理",name:"塔克拉瑪幹沙漠", question:"位於新疆南部", answer:"✅"},
+	{type:"地理",name:"安地斯山脈", question:"世界上最長的山脈", answer:"✅"},
+	{type:"地理",name:"干城章嘉峰", question:"是世界第三大高峰", answer:"✅"},
 
-		{type:"花",name:"牡丹", question:"是中國的國花", answer:"✅"},
-		{type:"花",name:"木槿", question:"是韓國的國花", answer:"✅"},
-	
-		{name:"塑膠瓶", question:"海裡存在永久", answer:"❌"}
+
+	{type:"花",name:"牡丹", question:"是中國的國花", answer:"✅"},
+	{type:"花",name:"木槿", question:"是韓國的國花", answer:"✅"},
+	{type:"花",name:"鬱金香", question:"是荷蘭的國花", answer:"✅"},
+
+	{name:"塑膠瓶", question:"海裡存在永久", answer:"❌"}
 
 
 ];
@@ -442,10 +453,8 @@ const div=document.createElement("div");
 div.className="item";
 
 div.innerHTML=`
-<div class="type">${q.type || ""}</div>
 <div class="name">${q.name}</div>
 <div class="question">${q.question}</div>
-<div class="answer" data-value="${q.answer}">答案：${q.answer}</div>
 `;
 
 if(q.answer==="❌"){
