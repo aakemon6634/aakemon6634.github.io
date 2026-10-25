@@ -180,7 +180,18 @@ h2{
   transform: translateY(-2px);
   box-shadow: 0 4px 15px #7663d955;
 }
+/* 手機版導覽列 */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 8px;
+    gap: 6px;
+  }
 
+  .navbar a {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
 /* 內容往下移避免被蓋住 */
 body{
   padding-top:60px;
