@@ -9,135 +9,184 @@
 
 <style>
 
-*{
-  box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  padding: 80px 20px 30px;
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  background:
+    radial-gradient(ellipse at top, #252344 0%, #171525 55%, #10101b 100%);
+  color: #f4f0ff;
+  min-height: 100vh;
+}
+
+/* 標題 */
 h1 {
   text-align: center;
-  margin: 50px 0;
-  font-size: 28px;
-  color:White;
-}
-body{
-  margin:0;
-  padding:20px;
-  font-family:"Microsoft JhengHei",Arial,sans-serif;
-  background:#171525;
-}
-.navbar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  background:#333;
-  padding:10px;
-  display:flex;
-  gap:10px;
-  z-index:1000;
+  margin: 25px 0 35px;
+  font-size: 34px;
+  letter-spacing: 3px;
+  color: #e5d8ff;
+  text-shadow: 0 0 18px rgba(164, 126, 255, 0.5);
 }
 
-.navbar a{
-  color:white;
-  text-decoration:none;
-  padding:8px 14px;
-  background:#555;
-  border-radius:6px;
+/* 導覽列 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(20, 20, 40, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #393455;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+/* 導覽列按鈕 */
+.navbar a {
+  color: #e7e0ff;
+  text-decoration: none;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #302b50, #25233c);
+  border: 1px solid #49436d;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.25s;
+}
+/* 滑鼠移上去的效果 */
+.navbar a:hover {
+  background: linear-gradient(135deg, #7663d9, #4c78dc);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px #7663d955;
 }
 
-.navbar a:hover{
-  background:#777;
+/* 圖片網格 */
+.imageGrid {
+  max-width: 1400px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
 }
-/* 圖片展示區 */
 
-.imageGrid{
-  max-width:1400px;
-  margin:auto;
+/* 每張圖片卡片 */
+.imageCard {
+  padding: 10px;
+  text-align: center;
+  background: linear-gradient(145deg, #24223a, #1b1a2b);
+  border: 1px solid #484265;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  transition: transform 0.25s, border-color 0.25s,
+              box-shadow 0.25s;
+}
 
-  display:grid;
-
-  /* 一行3張 */
-  grid-template-columns:repeat(3,1fr);
-
-  gap:20px;
+.imageCard:hover {
+  transform: translateY(-5px);
+  border-color: #a995ff;
+  box-shadow: 0 10px 28px rgba(133, 106, 255, 0.2);
 }
 
 /* 圖片 */
-
-.galleryImage{
-  width:100%;
-  height:250px;
-
-  object-fit:contain;
-
-  background:#211e2b;
-
-  cursor:pointer;
-
-  transition:.2s;
-
-  border-radius:10px;
+.galleryImage {
+  display: block;
+  width: 100%;
+  height: 250px;
+  object-fit: contain;
+  background: #12121f;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s;
 }
 
-  
-.galleryImage:hover{
-  transform:scale(1.03);
+.galleryImage:hover {
+  filter: brightness(1.08);
 }
 
-
-/* 放大圖片 */
-
-.imageViewer{
-
-  display:none;
-
-  position:fixed;
-
-  inset:0;
-
-  background:rgba(0,0,0,.9);
-
-  z-index:9999;
-
-  align-items:center;
-  justify-content:center;
-
-  padding:20px;
-
-  cursor:pointer;
+/* 圖片名稱 */
+.imageName {
+  margin: 13px 0 5px;
+  font-size: 17px;
+  font-weight: bold;
+  color: #eee7ff;
+  letter-spacing: 1px;
+  overflow-wrap: anywhere;
 }
 
-.viewerImage{
+/* 放大圖片背景 */
+.imageViewer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 7, 18, 0.94);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  cursor: pointer;
+}
 
-  max-width:95%;
-  max-height:95%;
-
-  object-fit:contain;
-
-  border-radius:10px;
-
-  cursor:default;
+/* 放大的圖片 */
+.viewerImage {
+  max-width: 95%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #7770a8;
+  box-shadow: 0 0 35px rgba(137, 113, 255, 0.2);
+  cursor: default;
 }
 
 /* 手機 */
-
-@media(max-width:600px){
-
-  body{
-    padding:10px;
+@media (max-width: 600px) {
+  body {
+    padding: 75px 10px 20px;
   }
 
-  .imageGrid{
-
-    /* 手機一行2張 */
-    grid-template-columns:repeat(2,1fr);
-
-    gap:8px;
+  h1 {
+    font-size: 25px;
+    margin: 25px 0;
+    letter-spacing: 1px;
   }
 
-  .galleryImage{
-    height:180px;
+  .navbar {
+    padding: 8px;
+    gap: 6px;
   }
 
+  .navbar a {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .imageGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .imageCard {
+    padding: 6px;
+    border-radius: 12px;
+  }
+
+  .galleryImage {
+    height: 160px;
+  }
+
+  .imageName {
+    margin-top: 9px;
+    font-size: 14px;
+  }
 }
 </style>
 
@@ -183,16 +232,20 @@ body{
 ========================= */
 
 const images = [
+  { src: "圖/p1.png", name: "" },
+  { src: "圖/p2.png", name: "" },
+  { src: "圖/p3.png", name: "" },
+  { src: "圖/p4.png", name: "" },
+  { src: "圖/p5.png", name: "" },
+  { src: "圖/p6.png", name: "意外福利" },
 
-  "圖/p1.png",
-  "圖/p2.png",
-  "圖/P3.png",
-  "圖/P4.png",
-  "圖/P5.png",
-  "圖/P6.png",
+ 
+
+
+ 
+ 
 
 ];
-
 
 /* =========================
    顯示圖片
@@ -202,25 +255,34 @@ const imageGrid =
   document.getElementById("imageGrid");
 
 
-images.forEach(src => {
+images.forEach(item => {
 
-  const img =
-    document.createElement("img");
+  // 建立卡片
+  const card = document.createElement("div");
+  card.className = "imageCard";
 
-  img.className="galleryImage";
+  // 建立圖片
+  const img = document.createElement("img");
+  img.className = "galleryImage";
+  img.src = item.src;
+  img.alt = item.name;
 
-  img.src=src;
-
-  img.onclick=()=>{
-
-    showImage(src);
-
+  // 點擊圖片放大
+  img.onclick = () => {
+    showImage(item.src);
   };
 
-  imageGrid.appendChild(img);
+  // 建立圖片名稱
+  const name = document.createElement("div");
+  name.className = "imageName";
+  name.textContent = item.name;
+
+  // 加入卡片
+  card.appendChild(img);
+  card.appendChild(name);
+  imageGrid.appendChild(card);
 
 });
-
 
 /* =========================
    放大圖片
