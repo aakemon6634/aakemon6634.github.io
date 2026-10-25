@@ -66,28 +66,54 @@
   .answer[data-value="❌"] {
     color: red;
   }
-.navbar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  background:#333;
-  padding:10px;
-  display:flex;
-  gap:10px;
-  z-index:1000;
+/* 導覽列 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(20, 20, 40, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #393455;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
 }
 
-.navbar a{
-  color:white;
-  text-decoration:none;
-  padding:8px 14px;
-  background:#555;
-  border-radius:6px;
+/* 導覽列按鈕 */
+.navbar a {
+  color: #e7e0ff;
+  text-decoration: none;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #302b50, #25233c);
+  border: 1px solid #49436d;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.25s;
 }
 
-.navbar a:hover{
-  background:#777;
+/* 滑鼠移上去的效果 */
+.navbar a:hover {
+  background: linear-gradient(135deg, #7663d9, #4c78dc);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px #7663d955;
+}
+
+/* 手機版導覽列 */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .navbar a {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
 }
 
 /* 內容往下移避免被蓋住 */
