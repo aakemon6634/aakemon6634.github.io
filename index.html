@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -6,8 +5,8 @@ html
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧QR Code點餐系統 (家人練習版)</title>
     <!-- 引入美化圖示與全網最穩定的 QR Code 產生庫 -->
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <script src="https://cloudflare.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         :root {
             --primary-color: #2ecc71;
@@ -26,7 +25,7 @@ html
         .guide-box { background: #f0f3f4; padding: 10px; border-radius: 8px; margin-top: 15px; text-align: left; font-size: 0.85rem; }
         .guide-box li { margin-left: 20px; margin-top: 3px; color: #5d6d7e; }
 
-        /* 👑 這次新增的超級顯眼：固定頂部桌號選擇區 */
+        /* 固定頂部桌號選擇區 */
         .table-selector-box { background: #f1c40f; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 3px solid #f39c12; }
         .table-select { font-size: 1.1rem; padding: 8px 15px; border-radius: 8px; border: 2px solid #d35400; background: white; font-weight: bold; color: #d35400; margin-left: 10px; cursor: pointer; outline: none; }
 
@@ -82,7 +81,7 @@ html
         </div>
     </div>
 
-    <!-- 👑 這次特別新增：強制在菜單最上方選擇桌號 -->
+    <!-- 強制在菜單最上方選擇桌號 -->
     <div class="table-selector-box">
         <label for="tableSelect"><i class="fa-solid fa-chair"></i> 請先選擇您的桌號：</label>
         <select id="tableSelect" class="table-select" onchange="checkTableSelected()">
@@ -175,89 +174,107 @@ html
             <button class="btn-close" onclick="closeModal()">確認</button>
         </div>
     </div>
-// 菜單資料庫
-const menuData = {
-1: { name: "招牌排骨飯", price: 100 },
-2: { name: "紅燒牛肉麵", price: 130 },
-3: { name: "鮮純貢丸湯", price: 40 },
-4: { name: "古早味紅茶", price: 30 }
-};
-let cart = {};
-// 👑 超穩定 QR Code 自動生成引擎 (修復消失問題)
-window.addEventListener('load', function() {
-let currentUrl = window.location.href;
-if(currentUrl.startsWith('file://')) {
-currentUrl = "github.com";
-}
-// 使用 QRious 套件，超穩定渲染，絕不消失
-new QRious({
-element: document.getElementById('qrcode'),
-value: currentUrl,
-size: 160,
-level: 'H'
-});
-});
-// 調整餐點數量
-function changeQty(id, delta) {
-if (!cart[id]) cart[id] = 0;
-cart[id] += delta;
-if (cart[id] <= 0) delete cart[id];
-document.getElementById(qty-${id}).innerText = cart[id] || 0;
-updateCartBar();
-}
-// 檢查是否有選桌號與點餐
-function checkTableSelected() {
-updateCartBar();
-}
-// 更新底部購物車
-function updateCartBar() {
-let totalItems = 0;
-let totalPrice = 0;
-for (let id in cart) {
-totalItems += cart[id];
-totalPrice += cart[id] * menuData[id].price;
-}
-document.getElementById('cart-count').innerText = totalItems;
-document.getElementById('total-price').innerText = $${totalPrice};
-// 必須同時滿足兩個條件：1. 有選桌號 2. 有點餐，送出按鈕才會亮起！
-const selectedTable = document.getElementById('tableSelect').value;
-document.getElementById('btn-submit').disabled = (totalItems === 0 || selectedTable === "");
-}
-// 送出訂單
-function submitOrder() {
-const selectedTable = document.getElementById('tableSelect').value;
-if (!selectedTable) {
-alert("請先選擇您的桌號！");
-return;
-}
-let detailString = "";
-let receiptHtml = <strong>桌號：</strong>${selectedTable}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">;
-let totalPrice = 0;
-for (let id in cart) {
-let item = menuData[id];
-let qty = cart[id];
-let subtotal = qty * item.price;
-totalPrice += subtotal;
-detailString += ${item.name} x${qty}; ;
-receiptHtml += <div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>;
-}
-receiptHtml += <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>;
-// 1. 顯示手機上的精緻成功彈窗
-document.getElementById('receipt-detail').innerHTML = receiptHtml;
-document.getElementById('modal-overlay').classList.add('active');
-// 2. 🚀 把資料塞進隱藏表單，強制對接 Google 試算表
-document.getElementById('form_table').value = selectedTable;
-document.getElementById('form_detail').value = detailString;
-document.getElementById('hiddenGoogleForm').submit();
-console.log("資料已透過原生表單安全發射至後台！");
-}
-// 關閉彈出視窗並清空
-function closeModal() {
-document.getElementById('modal-overlay').classList.remove('active');
-for(let id in cart) {
-document.getElementById(qty-${id}).innerText = 0;
-}
-cart = {};
-document.getElementById('tableSelect').value = ""; // 重設桌號
-updateCartBar();
-}
+
+    <form id="hiddenGoogleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeU6iPymfHkZ6nN-B_g_f7Wly9wz8Ld-0L6iXg0FmX3G4R26g/formResponse" method="POST" target="hidden_iframe" style="display:none;">
+        <input type="hidden" name="entry.880497554" id="form_table">
+        <input type="hidden" name="entry.1764654316" id="form_detail">
+    </form>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+    <script>
+        const menuData = {
+            1: { name: "招牌排骨飯", price: 100 },
+            2: { name: "紅燒牛肉麵", price: 130 },
+            3: { name: "鮮純貢丸湯", price: 40 },
+            4: { name: "古早味紅茶", price: 30 }
+        };
+
+        let cart = {};
+
+        window.addEventListener('load', function() {
+            let currentUrl = window.location.href;
+            if(currentUrl.startsWith('file://')) {
+                currentUrl = "https://github.com/"; 
+            }
+            
+            new QRious({
+                element: document.getElementById('qrcode'),
+                value: currentUrl,
+                size: 160,
+                level: 'H'
+            });
+        });
+
+        function changeQty(id, delta) {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += delta;
+            if (cart[id] <= 0) delete cart[id];
+            
+            document.getElementById(`qty-${id}`).innerText = cart[id] || 0;
+            updateCartBar();
+        }
+
+        function checkTableSelected() {
+            updateCartBar();
+        }
+
+        function updateCartBar() {
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                totalItems += cart[id];
+                totalPrice += cart[id] * menuData[id].price;
+            }
+
+            document.getElementById('cart-count').innerText = totalItems;
+            document.getElementById('total-price').innerText = `$${totalPrice}`;
+            
+            const selectedTable = document.getElementById('tableSelect').value;
+            document.getElementById('btn-submit').disabled = (totalItems === 0 || selectedTable === "");
+        }
+
+        function submitOrder() {
+            const selectedTable = document.getElementById('tableSelect').value;
+            if (!selectedTable) {
+                alert("請先選擇您的桌號！");
+                return;
+            }
+
+            let detailString = "";
+            let receiptHtml = `<strong>桌號：</strong>${selectedTable}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">`;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                let item = menuData[id];
+                let qty = cart[id];
+                let subtotal = qty * item.price;
+                totalPrice += subtotal;
+                
+                detailString += `${item.name} x${qty}; `;
+                receiptHtml += `<div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>`;
+            }
+            receiptHtml += `<hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>`;
+
+            document.getElementById('receipt-detail').innerHTML = receiptHtml;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            document.getElementById('form_table').value = selectedTable;
+            document.getElementById('form_detail').value = detailString;
+            document.getElementById('hiddenGoogleForm').submit(); 
+            
+            console.log("資料已透過原生表單安全發射至後台！");
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            for(let id in cart) {
+                document.getElementById(`qty-${id}`).innerText = 0;
+            }
+            cart = {};
+            document.getElementById('tableSelect').value = "";
+            updateCartBar();
+        }
+    </script>
+</body>
+</html>
