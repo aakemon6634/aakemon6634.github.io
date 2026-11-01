@@ -1,12 +1,13 @@
+html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧QR Code點餐系統 (家人練習版)</title>
-    <!-- 引入美化圖示與 QR Code 產生庫 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- 引入美化圖示與全網最穩定的 QR Code 產生庫 -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <script src="https://cloudflare.com"></script>
     <style>
         :root {
             --primary-color: #2ecc71;
@@ -14,32 +15,36 @@
             --bg-color: #f8f9fa;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        body { background-color: var(--bg-color); color: var(--dark-color); padding-bottom: 90px; }
+        body { background-color: var(--bg-color); color: var(--dark-color); padding-bottom: 100px; }
         
         /* 頂部QR桌牌區 */
         .qr-card { background: white; margin: 15px; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px dashed #bdc3c7; }
-        .table-badge { background: #e74c3c; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; display: inline-block; margin-bottom: 10px; }
-        .qr-card h2 { font-size: 1.5rem; margin-bottom: 5px; }
+        .qr-card h2 { font-size: 1.4rem; margin-bottom: 5px; }
         .qr-card p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; }
-        #qrcode { display: flex; justify-content: center; margin: 10px 0; min-height: 160px; align-items: center; }
-        .guide-box { background: #f0f3f4; padding: 10px; border-radius: 8px; margin-top: 15px; text-align: left; font-size: 0.9rem; }
+        .qrcode-container { display: flex; justify-content: center; margin: 10px 0; }
+        #qrcode { background: white; padding: 5px; border: 1px solid #eee; }
+        .guide-box { background: #f0f3f4; padding: 10px; border-radius: 8px; margin-top: 15px; text-align: left; font-size: 0.85rem; }
         .guide-box li { margin-left: 20px; margin-top: 3px; color: #5d6d7e; }
 
+        /* 👑 這次新增的超級顯眼：固定頂部桌號選擇區 */
+        .table-selector-box { background: #f1c40f; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 3px solid #f39c12; }
+        .table-select { font-size: 1.1rem; padding: 8px 15px; border-radius: 8px; border: 2px solid #d35400; background: white; font-weight: bold; color: #d35400; margin-left: 10px; cursor: pointer; outline: none; }
+
         /* 菜單區 */
-        .menu-title { padding: 15px 20px 5px 20px; font-size: 1.3rem; font-weight: bold; border-left: 5px solid var(--primary-color); margin: 10px 15px; }
+        .menu-title { padding: 10px 20px 5px 20px; font-size: 1.3rem; font-weight: bold; border-left: 5px solid var(--primary-color); margin: 20px 15px 10px 15px; }
         .item-list { padding: 0 15px; }
         .item-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .item-info h3 { font-size: 1.2rem; margin-bottom: 5px; }
         .item-price { color: #e74c3c; font-weight: bold; font-size: 1.1rem; }
         .item-control { display: flex; align-items: center; gap: 15px; }
-        .btn-circle { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f0f3f4; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-circle { width: 38px; height: 38px; border-radius: 50%; border: none; background: #f0f3f4; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-circle:active { transform: scale(0.9); background: #d5dbdb; }
         .btn-plus { background: var(--primary-color); color: white; }
         .btn-plus:active { background: #27ae60; }
-        .item-qty { font-size: 1.3rem; font-weight: bold; min-width: 20px; text-align: center; }
+        .item-qty { font-size: 1.3rem; font-weight: bold; min-width: 25px; text-align: center; }
 
         /* 底部常駐購物車 */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 100; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 100; }
         .cart-info { display: flex; align-items: center; gap: 12px; }
         .cart-icon-box { position: relative; background: #e8f8f5; color: var(--primary-color); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .cart-count { position: absolute; top: -5px; right: -5px; background: #e74c3c; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -62,24 +67,38 @@
 
     <!-- 頂部模擬實體 QR Code 桌牌 -->
     <div class="qr-card">
-        <div class="table-badge"><i class="fa-solid fa-chair"></i> 內用第 05 桌</div>
         <h2>歡迎光臨！請掃碼點餐</h2>
-        <p id="url-status-text">（正在產生專屬 QR Code...）</p>
-        <div id="qrcode"></div>
+        <p>（家人可用第二台手機掃描此條碼，即可開啟網頁練習）</p>
+        <div class="qrcode-container">
+            <img id="qrcode" alt="QR Code 加載中...">
+        </div>
         <div class="guide-box">
             <strong>💡 給家人的掃碼小指南：</strong>
             <ol>
                 <li>打開手機內建的「相機」App。</li>
                 <li>把鏡頭對準上面這張正方形 QR Code。</li>
-                <li>點擊畫面上跳出來的<strong>「黃色網址泡泡」</strong>，就能開始點餐！</li>
+                <li>點擊畫面上跳出來的<strong>「網址連結」</strong>，就能開始點餐！</li>
             </ol>
         </div>
+    </div>
+
+    <!-- 👑 這次特別新增：強制在菜單最上方選擇桌號 -->
+    <div class="table-selector-box">
+        <label for="tableSelect"><i class="fa-solid fa-chair"></i> 請先選擇您的桌號：</label>
+        <select id="tableSelect" class="table-select" onchange="checkTableSelected()">
+            <option value="">-- 請選擇 --</option>
+            <option value="內用 01 桌">內用 01 桌</option>
+            <option value="內用 02 桌">內用 02 桌</option>
+            <option value="內用 03 桌">內用 03 桌</option>
+            <option value="內用 05 桌">內用 05 桌</option>
+            <option value="外帶顧客">外帶自取</option>
+        </select>
     </div>
 
     <!-- 點餐主菜單區 -->
     <div class="menu-title">🌟 超人氣主食</div>
     <div class="item-list">
-        <div class="item-card" data-id="1" data-name="招牌排骨飯" data-price="100">
+        <div class="item-card" data-id="1">
             <div class="item-info">
                 <h3>招牌排骨飯</h3>
                 <div class="item-price">$100</div>
@@ -90,7 +109,7 @@
                 <button class="btn-circle btn-plus" onclick="changeQty(1, 1)">+</button>
             </div>
         </div>
-        <div class="item-card" data-id="2" data-name="紅燒牛肉麵" data-price="130">
+        <div class="item-card" data-id="2">
             <div class="item-info">
                 <h3>紅燒牛肉麵</h3>
                 <div class="item-price">$130</div>
@@ -105,7 +124,7 @@
 
     <div class="menu-title">🥤 經典湯品飲料</div>
     <div class="item-list">
-        <div class="item-card" data-id="3" data-name="鮮純貢丸湯" data-price="40">
+        <div class="item-card" data-id="3">
             <div class="item-info">
                 <h3>鮮純貢丸湯</h3>
                 <div class="item-price">$40</div>
@@ -116,7 +135,7 @@
                 <button class="btn-circle btn-plus" onclick="changeQty(3, 1)">+</button>
             </div>
         </div>
-        <div class="item-card" data-id="4" data-name="古早味紅茶" data-price="30">
+        <div class="item-card" data-id="4">
             <div class="item-info">
                 <h3>古早味紅茶</h3>
                 <div class="item-price">$30</div>
@@ -151,137 +170,94 @@
         <div class="modal-box">
             <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
             <h4>點餐成功！</h4>
-            <p style="color: #7f8c8d; font-size: 0.9rem;">訂單已即時同步至廚房後台</p>
-            <div class="receipt-area" id="receipt-detail">
-                <!-- 明細由 JS 動態生成 -->
-            </div>
+            <p style="color: #7f8c8d; font-size: 0.9rem;">訂單已傳送至雲端試算表後台</p>
+            <div class="receipt-area" id="receipt-detail"></div>
             <button class="btn-close" onclick="closeModal()">確認</button>
         </div>
     </div>
-
-    <script>
-        // ====== 📝 自動對接您的 Google 表單資訊 ======
-        const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeU6iPymfHkZ6nN-B_g_f7Wly9wz8Ld-0L6iXg0FmX3G4R26g/formResponse";
-        const ENTRY_TABLE = "entry.880497554";  // 桌號欄位代碼
-        const ENTRY_DETAIL = "entry.1764654316"; // 點餐明細欄位代碼
-        const CURRENT_TABLE = "內用 05 桌";
-        // ===============================================
-
-        // 菜單資料庫
-        const menuData = {
-            1: { name: "招牌排骨飯", price: 100 },
-            2: { name: "紅燒牛肉麵", price: 130 },
-            3: { name: "鮮純貢丸湯", price: 40 },
-            4: { name: "古早味紅茶", price: 30 }
-        };
-
-        // 購物車暫存
-        let cart = {};
-
-        // 智慧型 QR Code 自動生成晶片（修正：防範中文與特殊符號導致套件崩潰）
-        window.addEventListener('load', function() {
-            let currentUrl = window.location.href;
-            let statusText = document.getElementById("url-status-text");
-            
-            // 如果是在本機直接雙擊點開（file://），用範例網址代替，避免中文字元破壞 QR Code 產生器
-            if(currentUrl.startsWith('file://')) {
-                currentUrl = "https://github.com";
-                statusText.innerHTML = "<span style='color: #e67e22; font-weight: bold;'>⚠️ 目前在本機開啟</span><br>上傳到 GitHub Pages 後，此處會自動變成專屬點餐條碼！";
-            } else {
-                statusText.innerText = "（家人可用手機掃描此條碼，即可開啟網頁練習）";
-            }
-            
-            try {
-                document.getElementById("qrcode").innerHTML = ""; // 清空容器
-                new QRCode(document.getElementById("qrcode"), {
-                    text: currentUrl,
-                    width: 160,
-                    height: 160,
-                    colorDark : "#2c3e50",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.M // 使用 M 層級，對純網址容錯率最佳
-                });
-            } catch (err) {
-                console.error("QR Code 產生失敗:", err);
-                document.getElementById("qrcode").innerHTML = "<p style='color:red; font-size:0.9rem;'>條碼產生失敗，請上傳至 GitHub 測試</p>";
-            }
-        });
-
-        // 調整餐點數量功能
-        function changeQty(id, delta) {
-            if (!cart[id]) cart[id] = 0;
-            cart[id] += delta;
-            if (cart[id] <= 0) delete cart[id];
-            
-            // 更新畫面數字
-            document.getElementById(`qty-${id}`).innerText = cart[id] || 0;
-            updateCartBar();
-        }
-
-        // 更新底部購物車數據
-        function updateCartBar() {
-            let totalItems = 0;
-            let totalPrice = 0;
-
-            for (let id in cart) {
-                totalItems += cart[id];
-                totalPrice += cart[id] * menuData[id].price;
-            }
-
-            document.getElementById('cart-count').innerText = totalItems;
-            document.getElementById('total-price').innerText = `$${totalPrice}`;
-            document.getElementById('btn-submit').disabled = totalItems === 0;
-        }
-
-        // 核心功能：送出訂單到後台（Google 表單）
-        function submitOrder() {
-            let detailString = "";
-            let receiptHtml = `<strong>桌號：</strong>${CURRENT_TABLE}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">`;
-            let totalPrice = 0;
-
-            for (let id in cart) {
-                let item = menuData[id];
-                let qty = cart[id];
-                let subtotal = qty * item.price;
-                totalPrice += subtotal;
-                
-                // 串接成傳送到 Excel 的純文字格式
-                detailString += `${item.name} x${qty}; `;
-                // 串接成手機上跳出的精緻收據格式
-                receiptHtml += `<div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>`;
-            }
-            receiptHtml += `<hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>`;
-
-            // 顯示手機彈出成功視窗與單據
-            document.getElementById('receipt-detail').innerHTML = receiptHtml;
-            document.getElementById('modal-overlay').classList.add('active');
-
-            // 🚀 使用隱藏表單偷偷把數據發射到 Google 試算表
-            const formData = new FormData();
-            formData.append(ENTRY_TABLE, CURRENT_TABLE);
-            formData.append(ENTRY_DETAIL, detailString);
-
-            fetch(GOOGLE_FORM_URL, {
-                method: "POST",
-                body: formData,
-                mode: "no-cors" // 防止跨網域瀏覽器報錯
-            }).then(() => {
-                console.log("訂單已成功打包傳送至 Google 試算表！");
-            }).catch((err) => {
-                console.error("傳送失敗：", err);
-            });
-        }
-
-        // 關閉彈出視窗並清空購物車
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-            // 清空所有餐點數量
-            for(let id in cart) {
-                document.getElementById(`qty-${id}`).innerText = 0;
-            }
-            cart = {};
-            updateCartBar();
-        }
-    </script>
-</body>
-</html>
+// 菜單資料庫
+const menuData = {
+1: { name: "招牌排骨飯", price: 100 },
+2: { name: "紅燒牛肉麵", price: 130 },
+3: { name: "鮮純貢丸湯", price: 40 },
+4: { name: "古早味紅茶", price: 30 }
+};
+let cart = {};
+// 👑 超穩定 QR Code 自動生成引擎 (修復消失問題)
+window.addEventListener('load', function() {
+let currentUrl = window.location.href;
+if(currentUrl.startsWith('file://')) {
+currentUrl = "github.com";
+}
+// 使用 QRious 套件，超穩定渲染，絕不消失
+new QRious({
+element: document.getElementById('qrcode'),
+value: currentUrl,
+size: 160,
+level: 'H'
+});
+});
+// 調整餐點數量
+function changeQty(id, delta) {
+if (!cart[id]) cart[id] = 0;
+cart[id] += delta;
+if (cart[id] <= 0) delete cart[id];
+document.getElementById(qty-${id}).innerText = cart[id] || 0;
+updateCartBar();
+}
+// 檢查是否有選桌號與點餐
+function checkTableSelected() {
+updateCartBar();
+}
+// 更新底部購物車
+function updateCartBar() {
+let totalItems = 0;
+let totalPrice = 0;
+for (let id in cart) {
+totalItems += cart[id];
+totalPrice += cart[id] * menuData[id].price;
+}
+document.getElementById('cart-count').innerText = totalItems;
+document.getElementById('total-price').innerText = $${totalPrice};
+// 必須同時滿足兩個條件：1. 有選桌號 2. 有點餐，送出按鈕才會亮起！
+const selectedTable = document.getElementById('tableSelect').value;
+document.getElementById('btn-submit').disabled = (totalItems === 0 || selectedTable === "");
+}
+// 送出訂單
+function submitOrder() {
+const selectedTable = document.getElementById('tableSelect').value;
+if (!selectedTable) {
+alert("請先選擇您的桌號！");
+return;
+}
+let detailString = "";
+let receiptHtml = <strong>桌號：</strong>${selectedTable}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">;
+let totalPrice = 0;
+for (let id in cart) {
+let item = menuData[id];
+let qty = cart[id];
+let subtotal = qty * item.price;
+totalPrice += subtotal;
+detailString += ${item.name} x${qty}; ;
+receiptHtml += <div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>;
+}
+receiptHtml += <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>;
+// 1. 顯示手機上的精緻成功彈窗
+document.getElementById('receipt-detail').innerHTML = receiptHtml;
+document.getElementById('modal-overlay').classList.add('active');
+// 2. 🚀 把資料塞進隱藏表單，強制對接 Google 試算表
+document.getElementById('form_table').value = selectedTable;
+document.getElementById('form_detail').value = detailString;
+document.getElementById('hiddenGoogleForm').submit();
+console.log("資料已透過原生表單安全發射至後台！");
+}
+// 關閉彈出視窗並清空
+function closeModal() {
+document.getElementById('modal-overlay').classList.remove('active');
+for(let id in cart) {
+document.getElementById(qty-${id}).innerText = 0;
+}
+cart = {};
+document.getElementById('tableSelect').value = ""; // 重設桌號
+updateCartBar();
+}
