@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樂齡友善 QR Code 點餐練習板</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #e65100;
+            --secondary-color: #fff3e0;
+            --text-color: #333333;
+            --success-color: #2e7d32;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #f5f5f5; color: var(--text-color); padding-bottom: 100px; }
+        .setup-container { background: white; max-width: 500px; margin: 15px auto; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; border: 3px dashed #ffb74d; }
+        .table-badge { background-color: var(--primary-color); color: white; display: inline-block; padding: 6px 20px; border-radius: 20px; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; }
+        .qr-box { background: white; padding: 15px; display: inline-block; border: 2px solid #ddd; border-radius: 12px; margin: 15px 0; }
+        .guide-steps { text-align: left; background: #fff9c4; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .guide-steps h3 { color: #f57f17; margin-bottom: 8px; font-size: 1.1rem; }
+        .guide-steps ol { padding-left: 20px; font-size: 0.95rem; }
+        .guide-steps li { margin-bottom: 6px; }
+        .divider { text-align: center; margin: 30px auto 20px; max-width: 500px; position: relative; }
+        .divider::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #ddd; z-index: 1; }
+        .divider span { position: relative; z-index: 2; background: #f5f5f5; padding: 0 15px; color: #777; font-weight: bold; font-size: 0.9rem; }
+        .phone-mockup { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); position: relative; }
+        .restaurant-header { background: linear-gradient(135deg, var(--primary-color), #ff9800); color: white; padding: 25px 20px; text-align: center; }
+        .restaurant-header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        .category-tabs { display: flex; background: #fff; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #eee; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-weight: bold; font-size: 1.1rem; color: #666; cursor: pointer; }
+        .tab.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); background-color: var(--secondary-color); }
+        .menu-section { padding: 15px; }
+        .menu-item { display: flex; background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); align-items: center; border: 1px solid #f0f0f0; }
+        .item-img { width: 80px; height: 80px; background: #ffe0b2; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-right: 15px; }
+        .item-info { flex: 1; }
+        .item-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; }
+        .item-price { color: var(--primary-color); font-weight: bold; font-size: 1.1rem; }
+        .control-box { display: flex; align-items: center; gap: 12px; }
+        .btn-calc { width: 36px; height: 36px; border-radius: 50%; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-minus { background-color: #e0e0e0; color: #333; }
+        .btn-plus { background-color: var(--primary-color); color: white; }
+        .item-count { font-size: 1.3rem; font-weight: bold; min-width: 20px; text-align: center; }
+        .cart-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: #ffffff; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 99; border-radius: 16px 16px 0 0; }
+        .cart-total { font-size: 1.4rem; font-weight: bold; color: var(--primary-color); }
+        .btn-submit { background: var(--success-color); color: white; border: none; padding: 12px 28px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; }
+        .btn-submit:disabled { background: #bdbdbd; cursor: not-allowed; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .receipt-card { background: white; width: 100%; max-width: 400px; border-radius: 16px; padding: 25px; text-align: center; }
+        .receipt-details { border-top: 2px dashed #ddd; border-bottom: 2px dashed #ddd; padding: 15px 0; margin-bottom: 20px; text-align: left; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .btn-close { background: #424242; color: white; border: none; width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="table-badge">桌號：05 桌</div>
+        <h2>✨ 實體點餐 QR Code 練習貼紙 ✨</h2>
+        <p style="color: #666; font-size: 0.95rem; margin-top: 5px;">（這個條碼是真的！可用另一台手機對著螢幕掃碼）</p>
+        <div class="qr-box">
+            <div id="qrcode"></div>
+        </div>
+        <div class="guide-steps">
+            <h3>💡 怎麼陪長輩練習？</h3>
+            <ol>
+                <li><b>拿出另一台手機</b>，打開一般相機。</li>
+                <li>對準畫面上這個 <b>QR Code 條碼</b>。</li>
+                <li>點選畫面上跳出的<b>網址泡泡</b>，就能直接用那台手機點餐囉！</li>
+                <li><i>(如果只有一台手機，直接往下滾動就能在畫面上直接練習)</i></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="divider"><span>👇 下方為點餐系統畫面 👇</span></div>
+
+    <div class="phone-mockup">
+        <div class="restaurant-header">
+            <h1>幸福巷口大排檔</h1>
+            <p>座位號碼：內用 05 桌</p>
+        </div>
+        <div class="category-tabs">
+            <div class="tab active" id="tab-main" onclick="switchCategory('main')">🍛 主餐飽胃</div>
+            <div class="tab" id="tab-soup" onclick="switchCategory('soup')">🥣 暖胃湯品</div>
+        </div>
+        <div class="menu-section">
+            <div id="cat-main">
+                <div class="menu-item">
+                    <div class="item-img">🍱</div>
+                    <div class="item-info"><div class="item-name">古早味排骨飯</div><div class="item-price">$100</div></div>
+                    <div class="control-box">
+                        <button class="btn-calc btn-minus" onclick="updateQty('item1', -1)">-</button>
+                        <span class="item-count" id="qty-item1">0</span>
+                        <button class="btn-calc btn-plus" onclick="updateQty('item1', 1)">+</button>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-img">🍜</div>
+                    <div class="item-info"><div class="item-name">招牌牛肉麵</div><div class="item-price">$140</div></div>
+                    <div class="control-box">
+                        <button class="btn-calc btn-minus" onclick="updateQty('item2', -1)">-</button>
+                        <span class="item-count" id="qty-item2">0</span>
+                        <button class="btn-calc btn-plus" onclick="updateQty('item2', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <div id="cat-soup" style="display: none;">
+                <div class="menu-item">
+                    <div class="item-img">🥣</div>
+                    <div class="item-info"><div class="item-name">鮮美貢丸湯</div><div class="item-price">$35</div></div>
+                    <div class="control-box">
+                        <button class="btn-calc btn-minus" onclick="updateQty('item4', -1)">-</button>
+                        <span class="item-count" id="qty-item4">0</span>
+                        <button class="btn-calc btn-plus" onclick="updateQty('item4', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cart-bar">
+            <div class="cart-info">
+                <span id="cart-summary" style="font-size:0.9rem;color:#666;">尚未選擇餐點</span>
+                <span class="cart-total" id="cart-total-price">總計: $0</span>
+            </div>
+            <button class="btn-submit" id="btn-submit-order" disabled onclick="submitOrder()">送出訂單</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="receipt-modal">
+        <div class="receipt-card">
+            <div style="font-size:3.5rem;color:var(--success-color);">🎉</div>
+            <div class="receipt-title">點餐成功！</div>
+            <div class="receipt-details" id="receipt-list"></div>
+            <button class="btn-close" onclick="closeModal()">好，我知道了</button>
+        </div>
+    </div>
+
+    <script>
+        const menuData = {
+            item1: { name: '古早味排骨飯', price: 100, qty: 0 },
+            item2: { name: '招牌牛肉麵', price: 140, qty: 0 },
+            item4: { name: '鮮美貢丸湯', price: 35, qty: 0 }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let url = window.location.href;
+            if(url.startsWith('file://') || url.includes('localhost')) {
+                url = "https://codepen.io/shun_w/full/bNbyXgL";
+            }
+            new QRCode(document.getElementById("qrcode"), {
+                text: url,
+                width: 160,
+                height: 160,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        });
+
+        function switchCategory(cat) {
+            document.getElementById('tab-main').classList.toggle('active', cat==='main');
+            document.getElementById('tab-soup').classList.toggle('active', cat==='soup');
+            document.getElementById('cat-main').style.display = cat==='main' ? 'block' : 'none';
+            document.getElementById('cat-soup').style.display = cat==='soup' ? 'block' : 'none';
+        }
+
+        function updateQty(id, change) {
+            menuData[id].qty = Math.max(0, menuData[id].qty + change);
+            document.getElementById(`qty-${id}`).innerText = menuData[id].qty;
+            calculateCart();
+        }
+
+        function calculateCart() {
+            let items = 0, price = 0;
+            for (let k in menuData) { items += menuData[k].qty; price += menuData[k].qty * menuData[k].price; }
+            document.getElementById('cart-summary').innerText = items > 0 ? `已選 ${items} 份餐點` : '尚未選擇餐點';
+            document.getElementById('cart-total-price').innerText = `總計: $${price}`;
+            document.getElementById('btn-submit-order').disabled = items === 0;
+        }
+
+        function submitOrder() {
+            let html = '', total = 0;
+            for (let k in menuData) {
+                if (menuData[k].qty > 0) {
+                    let sub = menuData[k].qty * menuData[k].price; total += sub;
+                    html += `<div class="receipt-row"><span>${menuData[k].name} x${menuData[k].qty}</span><span>$${sub}</span></div>`;
+                }
+            }
+            html += `<hr style="margin:10px 0;border-style:dashed;"><div class="receipt-row" style="font-weight:bold;"><span>總計</span><span>$${total}</span></div>`;
+            document.getElementById('receipt-list').innerHTML = html;
+            document.getElementById('receipt-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('receipt-modal').classList.remove('active');
+            for (let k in menuData) { menuData[k].qty = 0; document.getElementById(`qty-${k}`).innerText = '0'; }
+            calculateCart();
+        }
+    </script>
+</body>
+</html>
