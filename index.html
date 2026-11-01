@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智慧QR Code點餐系統 (家人練習版)</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
-    <script src="https://cloudflare.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         :root { --primary-color: #2ecc71; --dark-color: #2c3e50; --bg-color: #f8f9fa; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", sans-serif; }
@@ -14,7 +14,7 @@
         .qr-card h2 { font-size: 1.4rem; margin-bottom: 5px; }
         .qr-card p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; }
         .qrcode-container { display: flex; justify-content: center; margin: 10px 0; }
-        #qrcode { background: white; padding: 5px; border: 1px solid #eee; }
+        #qrcode { background: white; padding: 5px; border: 1px solid #eee; width: 160px; height: 160px; }
         .guide-box { background: #f0f3f4; padding: 10px; border-radius: 8px; margin-top: 15px; text-align: left; font-size: 0.85rem; }
         .guide-box li { margin-left: 20px; margin-top: 3px; color: #5d6d7e; }
         .table-selector-box { background: #f1c40f; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 3px solid #f39c12; }
@@ -54,7 +54,7 @@
         <h2>歡迎光臨！請掃碼點餐</h2>
         <p>（家人可用第二台手機掃描此條碼，即可開啟網頁練習）</p>
         <div class="qrcode-container">
-            <img id="qrcode" alt="QR Code 加載中...">
+            <canvas id="qrcode"></canvas>
         </div>
         <div class="guide-box">
             <strong>💡 給家人的掃碼小指南：</strong>
@@ -160,76 +160,91 @@
         </div>
     </div>
 
-    <!-- 👑 這次修復核心：真正的安全太空隧道式隱藏表單傳送 -->
+    <!-- 隱藏 iframe 發送 -->
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
+    <form id="hiddenGoogleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeU6iPymfHkZ6nN-B_g_f7Wly9wz8Ld-0L6iXg0FmX3G4R26g/formResponse" method="POST" target="hidden_iframe" style="display:none;">
+        <input type="hidden" name="entry.880497554" id="form_table">
+        <input type="hidden" name="entry.1764654316" id="form_detail">
+    </form>
 
     <script>
-      const menuData = {
-1: { name: "招牌排骨飯", price: 100 },
-2: { name: "紅燒牛肉麵", price: 130 },
-3: { name: "鮮純貢丸湯", price: 40 },
-4: { name: "古早味紅茶", price: 30 }
-};
-let cart = {};
-window.addEventListener('load', function() {
-let currentUrl = window.location.href;
-if(currentUrl.startsWith('file://')) {
-currentUrl = "github.com";
-}
-new QRious({
-element: document.getElementById('qrcode'),
-value: currentUrl,
-size: 160,
-level: 'H'
-});
-});
-function changeQty(id, delta) {
-if (!cart[id]) cart[id] = 0;
-cart[id] += delta;
-if (cart[id] <= 0) delete cart[id];
-document.getElementById(qty-${id}).innerText = cart[id] || 0;
-updateCartBar();
-}
-function checkTableSelected() { updateCartBar(); }
-function updateCartBar() {
-let totalItems = 0; let totalPrice = 0;
-for (let id in cart) {
-totalItems += cart[id];
-totalPrice += cart[id] * menuData[id].price;
-}
-document.getElementById('cart-count').innerText = totalItems;
-document.getElementById('total-price').innerText = $${totalPrice};
-const selectedTable = document.getElementById('tableSelect').value;
-document.getElementById('btn-submit').disabled = (totalItems === 0 || selectedTable === "");
-}
-function submitOrder() {
-const selectedTable = document.getElementById('tableSelect').value;
-if (!selectedTable) { alert("請先選擇您的桌號！"); return; }
-let detailString = "";
-let receiptHtml = <strong>桌號：</strong>${selectedTable}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">;
-let totalPrice = 0;
-for (let id in cart) {
-let item = menuData[id]; let qty = cart[id]; let subtotal = qty * item.price;
-totalPrice += subtotal;
-detailString += ${item.name} x${qty}; ;
-receiptHtml += <div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>;
-}
-receiptHtml += <hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>;
-document.getElementById('receipt-detail').innerHTML = receiptHtml;
-document.getElementById('modal-overlay').classList.add('active');
-// 🚀 正確透過隱藏 iframe 發送，百分之百防封鎖突破
-document.getElementById('form_table').value = selectedTable;
-document.getElementById('form_detail').value = detailString;
-document.getElementById('hiddenGoogleForm').submit();
-}
-function closeModal() {
-document.getElementById('modal-overlay').classList.remove('active');
-for(let id in cart) { document.getElementById(qty-${id}).innerText = 0; }
-cart = {};
-document.getElementById('tableSelect').value = "";
-updateCartBar();
-}
+        const menuData = {
+            1: { name: "招牌排骨飯", price: 100 },
+            2: { name: "紅燒牛肉麵", price: 130 },
+            3: { name: "鮮純貢丸湯", price: 40 },
+            4: { name: "古早味紅茶", price: 30 }
+        };
+
+        let cart = {};
+
+        window.addEventListener('load', function() {
+            let currentUrl = window.location.href;
+            if(currentUrl.startsWith('file://')) {
+                currentUrl = "https://github.com/"; 
+            }
+            
+            // 👑 將原本的 <img> 改為真正的 <canvas> 渲染，徹底解決圖片圖標破裂、載入失敗的問題！
+            new QRious({
+                element: document.getElementById('qrcode'),
+                value: currentUrl,
+                size: 160,
+                level: 'H'
+            });
+        });
+
+        function changeQty(id, delta) {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += delta;
+            if (cart[id] <= 0) delete cart[id];
+            document.getElementById(`qty-${id}`).innerText = cart[id] || 0;
+            updateCartBar();
+        }
+
+        function checkTableSelected() { updateCartBar(); }
+
+        function updateCartBar() {
+            let totalItems = 0; let totalPrice = 0;
+            for (let id in cart) {
+                totalItems += cart[id];
+                totalPrice += cart[id] * menuData[id].price;
+            }
+            document.getElementById('cart-count').innerText = totalItems;
+            document.getElementById('total-price').innerText = `$${totalPrice}`;
+            const selectedTable = document.getElementById('tableSelect').value;
+            document.getElementById('btn-submit').disabled = (totalItems === 0 || selectedTable === "");
+        }
+
+        function submitOrder() {
+            const selectedTable = document.getElementById('tableSelect').value;
+            if (!selectedTable) { alert("請先選擇您的桌號！"); return; }
+
+            let detailString = "";
+            let receiptHtml = `<strong>桌號：</strong>${selectedTable}<br><hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;">`;
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                let item = menuData[id]; let qty = cart[id]; let subtotal = qty * item.price;
+                totalPrice += subtotal;
+                detailString += `${item.name} x${qty}; `;
+                receiptHtml += `<div>${item.name} x${qty} <span style="float:right;">$${subtotal}</span></div>`;
+            }
+            receiptHtml += `<hr style="margin:8px 0; border:0; border-top:1px dashed #ccc;"><strong>總計金額：<span style="float:right; color:#e74c3c;">$${totalPrice}</span></strong>`;
+
+            document.getElementById('receipt-detail').innerHTML = receiptHtml;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            document.getElementById('form_table').value = selectedTable;
+            document.getElementById('form_detail').value = detailString;
+            document.getElementById('hiddenGoogleForm').submit();
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            for(let id in cart) { document.getElementById(`qty-${id}`).innerText = 0; }
+            cart = {};
+            document.getElementById('tableSelect').value = "";
+            updateCartBar();
+        }
     </script>
 </body>
 </html>
