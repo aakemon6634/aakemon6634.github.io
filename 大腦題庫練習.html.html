@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>風國大腦題庫－線上練習測驗</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff, #e2ecff);
+  margin: 0;
+  padding: 20px;
+  padding-top: 80px;
+  color: #222;
+}
+
+/* 導覽列 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(20, 20, 40, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #393455;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.navbar a {
+  color: #e7e0ff;
+  text-decoration: none;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #302b50, #25233c);
+  border: 1px solid #49436d;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.25s;
+}
+
+.navbar a:hover {
+  background: linear-gradient(135deg, #7663d9, #4c78dc);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* 主容器 */
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 26px;
+}
+
+/* 設定區 */
+.setup-group {
+  margin-bottom: 20px;
+}
+
+.setup-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #34495e;
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 2px solid #cbd5e1;
+  background: #f8fafc;
+  font-family: inherit;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #4a7dff, #2f5ee0);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(74, 125, 255, 0.4);
+}
+
+/* 測驗進行區 */
+.hidden {
+  display: none !important;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: bold;
+  color: #64748b;
+}
+
+.badge {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #4a7dff;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.question-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.q-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.q-text {
+  font-size: 20px;
+  color: #475569;
+}
+
+.answer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.ans-btn {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-true {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.btn-true:hover:not(:disabled) {
+  background: #bbf7d0;
+  transform: translateY(-2px);
+}
+
+.btn-false {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.btn-false:hover:not(:disabled) {
+  background: #fecaca;
+  transform: translateY(-2px);
+}
+
+.ans-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.feedback-box {
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.fb-correct {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.fb-wrong {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+/* 結算區 */
+.score-display {
+  text-align: center;
+  padding: 20px;
+  background: #f1f5f9;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.score-number {
+  font-size: 42px;
+  font-weight: bold;
+  color: #2f5ee0;
+}
+
+.wrong-list {
+  margin-top: 20px;
+}
+
+.wrong-item {
+  background: #fff5f5;
+  border-left: 4px solid #ef4444;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #334155;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+/* 📱 手機自適應 */
+@media (max-width: 600px) {
+  body {
+    padding: 12px;
+    padding-top: 95px;
+  }
+  .container {
+    padding: 18px;
+  }
+  h1 {
+    font-size: 22px;
+  }
+  .navbar {
+    padding: 8px;
+    gap: 6px;
+  }
+  .navbar a {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .answer-buttons, .result-actions {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="https://github.io">聖團答題</a>
+  <a href="https://github.io">風國大腦題庫</a>
+  <a href="https://github.io">護送明信片圖鑑</a>
+</div>
+
+<div class="container">
+  <h1>🧠 風國大腦－隨機練習測驗</h1>
+
+  <!-- 1. 設定畫面 -->
+  <div id="setupScreen">
+    <div class="setup-group">
+      <label for="categorySelect">選擇練習分類：</label>
+      <select id="categorySelect">
+        <option value="all">全部分類（隨機出題）</option>
+        <option value="npc">NPC</option>
+        <option value="遊戲">遊戲</option>
+        <option value="電玩">電玩</option>
+        <option value="魂">魂卡</option>
+        <option value="動畫">動畫</option>
+        <option value="人名">人名 / 書名</option>
+        <option value="化學">化學</option>
+        <option value="生物">生物</option>
+        <option value="醫學">醫學</option>
+        <option value="海">海 / 河</option>
+        <option value="食物">食物</option>
+        <option value="神話">神話</option>
+        <option value="地科">地科</option>
+        <option value="國家">國家</option>
+        <option value="地理">地理</option>
+        <option value="花">花</option>
+      </select>
+    </div>
+
+    <div class="setup-group">
+      <label for="countSelect">選擇題目數量：</label>
+      <select id="countSelect">
+        <option value="10">10 題（快速練習）</option>
+        <option value="20" selected>20 題（標準測驗）</option>
+        <option value="30">30 題（進階挑戰）</option>
+        <option value="999">該分類全部題目</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="startQuiz(false)">開始練習</button>
+  </div>
+
+  <!-- 2. 測驗進行畫面 -->
+  <div id="quizScreen" class="hidden">
+    <div class="progress-header">
+      <span id="progressText">第 1 / 20 題</span>
+      <span id="categoryBadge" class="badge">分類</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div id="progressBar" class="progress-bar-fill"></div>
+    </div>
+
+    <div class="question-card">
+      <div id="qName" class="q-name">題目主詞</div>
+      <div id="qText" class="q-text">題目敘述內容</div>
+    </div>
+
+    <div class="answer-buttons">
+      <button id="btnTrue" class="ans-btn btn-true" onclick="submitAnswer('✅')">⭕ 正確 (✅)</button>
+      <button id="btnFalse" class="ans-btn btn-false" onclick="submitAnswer('❌')">❌ 錯誤 (❌)</button>
+    </div>
+
+    <div id="feedbackBox" class="feedback-box hidden"></div>
+    <button id="nextBtn" class="btn-primary hidden" onclick="nextQuestion()">下一題 ➔</button>
+  </div>
+
+  <!-- 3. 測驗結算畫面 -->
+  <div id="resultScreen" class="hidden">
+    <div class="score-display">
+      <div>測驗完成！您的得分</div>
+      <div id="scoreText" class="score-number">100 分</div>
+      <div id="detailText" style="color:#64748b; margin-top:6px;">答對 20 / 20 題</div>
+    </div>
+
+    <div id="wrongSection" class="wrong-list hidden">
+      <h3 style="color:#b91c1c; margin-bottom:10px;">📝 本次答錯題目（點擊下方可重練錯題）：</h3>
+      <div id="wrongListContainer"></div>
+    </div>
+
+    <div class="result-actions">
+      <button id="retryWrongBtn" class="btn-primary hidden" onclick="startQuiz(true)" style="margin-top:0; background:linear-gradient(135deg, #ef4444, #dc2626);">只練錯題</button>
+      <button class="btn-secondary" onclick="resetToSetup()">重新選擇題庫</button>
+    </div>
+  </div>
+</div>
+<script>
+const quizData = [
+  {type:"npc",name:"拉魯", question:"奪寶奇兵", answer:"✅"},
+  {type:"npc",name:"芭芭拉", question:"聖徒導師", answer:"✅"},
+  {type:"npc",name:"阿提亞", question:"秘寶任務傳送人", answer:"✅"},
+  {type:"npc",name:"神木鎮的托爾", question:"買火把", answer:"✅"},
+  {type:"npc",name:"神木鎮的南茜太太", question:"怕花粉", answer:"✅"},
+  {type:"npc",name:"教堂艾德文神父", question:"結婚", answer:"✅"},
+  {type:"npc",name:"教堂艾德文神父", question:"密友", answer:"❌"},
+  {type:"npc",name:"聖團的道格", question:"任命主戰菁英", answer:"✅"},
+  {type:"npc",name:"聖團的薇薇安", question:"勇者鬥惡龍", answer:"✅"},
+  {type:"npc",name:"羅傑", question:"裝備副本傳送人", answer:"❌"},
+
+  {type:"遊戲",name:"30級玩家", question:"玩斬邪", answer:"❌"},
+  {type:"遊戲",name:"可使用忘憂果", question:"洗練守護的天生技能", answer:"✅"},
+  {type:"遊戲",name:"全身強化105級時", question:"紅色光芒", answer:"❌"},
+  {type:"遊戲",name:"使用妖精八音盒", question:"獲得彩螺", answer:"❌"},
+  {type:"遊戲",name:"使用夏日果汁", question:"守護獸提升等級", answer:"✅"},
+  {type:"遊戲",name:"補蛋網可以抓到", question:"閃守護", answer:"❌"},
+  {type:"遊戲",name:"補蛋網可以抓到", question:"金色守護", answer:"✅"},
+  {type:"遊戲",name:"補蛋網可以拿來", question:"捉嗅嗅", answer:"❌"},
+  {type:"遊戲",name:"裝備打孔", question:"鑲嵌魂卡", answer:"✅"},
+  {type:"遊戲",name:"魂卡秘境", question:"金色魂卡", answer:"✅"},
+  {type:"遊戲",name:"黎明盛典", question:"8顆魂珠", answer:"❌"},
+  {type:"遊戲",name:"護送任務", question:"妖精音樂盒", answer:"✅"},
+  {type:"遊戲",name:"炎術士可以使用", question:"冰風暴", answer:"✅"},
+  {type:"遊戲",name:"禦靈可以自由", question:"選擇召喚的顏色", answer:"❌"},
+  {type:"遊戲",name:"忍者不攻擊就可以", question:"一直隱身", answer:"❌"},
+  {type:"遊戲",name:"裝備秘境中", question:"70級金色", answer:"❌"},
+  {type:"遊戲",name:"魂卡強化", question:"需要消耗瑪娜", answer:"✅"},
+
+  {type:"電玩",name:"塞爾達傳說:曠野之息", question:"扮演的角色是塞爾達", answer:"❌"},
+  {type:"電玩",name:"馬力歐的衣服", question:"沒有綠色", answer:"✅"},
+  {type:"電玩",name:"超級瑪麗吃了蘑菇", question:"會無敵", answer:"❌"},
+  {type:"電玩",name:"蟲族是", question:"《魔獸世界》中的種族", answer:"❌"},
+
+  {type:"魂",name:"托雷希雅提供", question:"衝擊波", answer:"✅"},
+  {type:"魂",name:"米諾娃魂卡提供", question:"聖域之劍", answer:"✅"},
+  {type:"魂",name:"神櫻魂卡提供", question:"漫天飛花", answer:"❌"},
+  {type:"魂",name:"雪狼魂卡提供", question:"狼人", answer:"❌"},
+  {type:"魂",name:"雪緒魂卡提供", question:"冰封乾裡", answer:"❌"},
+  {type:"魂",name:"啾比魂卡提供", question:"啾力可出擊", answer:"✅"},
+  {type:"魂",name:"蝙蝠提供", question:"吸血", answer:"❌"},
+  {type:"魂",name:"傘蓋菇提供", question:"天降正義", answer:"✅"},
+  {type:"魂",name:"蕾拉魂卡提供", question:"魅惑技能", answer:"❌"},
+  {type:"魂",name:"火焰菇魂卡提供", question:"定時炸彈", answer:"✅"},
+
+  {type:"動畫",name:"七龍珠", question:"琪琪是孫悟空的妻子", answer:"✅"},
+  {type:"動畫",name:"火影忍者", question:"岸本齊史", answer:"✅"},
+  {type:"動畫",name:"名偵探柯南", question:"工藤新一", answer:"✅"},
+  {type:"動畫",name:"名偵探柯南沒有完結", question:"青山剛昌", answer:"✅"},
+  {type:"動畫",name:"在地下城尋求邂逅是否搞錯了什麼", question:"主角名字叫貝爾", answer:"✅"},
+  {type:"動畫",name:"死神漫畫已結束", question:"久保帶人", answer:"✅"},
+  {type:"動畫",name:"死神BLEACH", question:"夜神月", answer:"❌"},
+  {type:"動畫",name:"科學的超電磁砲", question:"白井黑子", answer:"❌"},
+  {type:"動畫",name:"航海王", question:"尾田榮一郎", answer:"✅"},
+  {type:"動畫",name:"機動戰士鋼彈SEED", question:"飛鳥真", answer:"❌"},
+  {type:"動畫",name:"鋼之煉金術士", question:"動畫於2005年首次上映", answer:"❌"},
+  {type:"動畫",name:"魔卡少女櫻", question:"「我代表月亮消滅你們」", answer:"❌"},
+  {type:"動畫",name:"JOJO星塵鬥士反派", question:"DIO", answer:"✅"},
+  {type:"動畫",name:"空條承太郎替身", question:"世界", answer:"❌"},
+  {type:"動畫",name:"《鋼之煉金術士》主角兄弟中的哥哥", question:"愛德華·艾爾利克", answer:"✅"},
+  {type:"動畫",name:"《機動戰士高達》創始人", question:"富野由悠季", answer:"✅"},
+
+  {type:"人名",name:"阿米爾·罕", question:"《我和我的冠軍女兒》", answer:"✅"},
+  {type:"人名",name:"亞當斯密", question:"《國富論》", answer:"✅"},
+  {type:"人名",name:"北野武自", question:"《菊次郎之夏》", answer:"✅"},
+  {type:"人名",name:"杜甫", question:"《無邊落木蕭蕭下》", answer:"✅"},
+  {type:"人名",name:"李白", question:"是唐代維達的浪漫主義詩人", answer:"✅"},
+  {type:"人名",name:"姬昌", question:"《週易》", answer:"✅"},
+  {type:"人名",name:"莎士比亞", question:"《哈姆雷特》", answer:"✅"},
+  {type:"人名",name:"梵谷", question:"《星月夜》", answer:"✅"},
+  {type:"人名",name:"萊特兄弟", question:"飛機發明者", answer:"✅"},
+  {type:"人名",name:"達利", question:"是著名的西班牙畫家超現實主義作品而聞名", answer:"✅"},
+  {type:"人名",name:"蕭邦", question:"波蘭著名鋼琴家", answer:"✅"},
+  {type:"人名",name:"塞尚", question:"現代藝術之父", answer:"✅"},
+  {type:"人名",name:"斯坦尼斯拉夫斯基", question:"《演員的自我修養》", answer:"✅"},
+  {type:"人名",name:"雅達利", question:"第一台遊戲機", answer:"✅"},
+  {type:"人名",name:"格林兄弟", question:"童話《賣火柴的小女孩》。", answer:"❌"},
+  {type:"人名",name:"莫內", question:"是法國畫派代表人物浪漫主義", answer:"❌"},
+  {type:"人名",name:"梵谷", question:"37歲的人生中留下無數畫作", answer:"❌"},
+  {type:"人名",name:"達利", question:"《記憶的永恆》《一條哈巴狗》等", answer:"❌"},
+  {type:"人名",name:"歐陽修", question:"《春江花月夜》", answer:"❌"},
+  {type:"人名",name:"蕭邦", question:"鋼琴家與作曲家", answer:"❌"},
+  {type:"人名",name:"蕭邦。", question:"《命運交響曲》", answer:"❌"},
+  {type:"人名",name:"貝多芬", question:"《降E大調夜曲》", answer:"❌"},
+  {type:"人名",name:"愛因斯坦", question:"最先發現了白色光的組成", answer:"❌"},
+  {type:"人名",name:"杉田智和", question:"職業是演員", answer:"❌"},
+  {type:"人名",name:"《荷馬史詩》", question:"以特洛伊戰爭為背景的", answer:"✅"},
+  {type:"人名",name:"《盜夢空間》", question:"由萊昂納多·迪卡普里奥(LeonardoDiCaprio)主演的電影", answer:"✅"},
+
+  {type:"化學",name:"鋁", question:"地殼含量最多的金屬元素", answer:"✅"},
+  {type:"化學",name:"鋨", question:"密度最大的金屬", answer:"✅"},
+  {type:"化學",name:"鈉", question:"遇水會發生化學性爆炸", answer:"✅"},
+  {type:"化學",name:"鈣", question:"人體含量最高的金屬", answer:"✅"},
+  {type:"化學",name:"乾冰", question:"固態上升", answer:"✅"},
+  {type:"化學",name:"乾冰", question:"指的是固態二氧化碳", answer:"✅"},
+  {type:"化學",name:"臭氧", question:"可以用來給水消毒", answer:"✅"},
+  {type:"化學",name:"化合物是蛋白質", question:"沙漠中植物體內含量最多的。", answer:"❌"},
+  {type:"化學",name:"氧氣", question:"空氣中含量最多的氣體", answer:"❌"},
+  {type:"化學",name:"金", question:"孔徑最大的金屬", answer:"❌"},
+
+  {type:"生物",name:"大象", question:"世界上最大的哺乳動物", answer:"❌"},
+  {type:"生物",name:"北極熊", question:"德國的國寶動物", answer:"❌"},
+  {type:"生物",name:"灰熊", question:"俄羅斯的國寶", answer:"❌"},
+  {type:"生物",name:"蚊子", question:"有兩對翅膀", answer:"❌"},
+  {type:"生物",name:"蜜蜂", question:"是世界上最小的鳥類", answer:"❌"},
+  {type:"生物",name:"熊貓", question:"是中國的國寶動物", answer:"✅"},
+  {type:"生物",name:"企鵝", question:"5月產卵", answer:"✅"},
+  {type:"生物",name:"鯊魚", question:"是胎生動物", answer:"✅"},
+  {type:"生物",name:"吸蜜蜂鳥", question:"是世界上最小的鳥", answer:"✅"},
+  {type:"生物",name:"浮游生物", question:"海洋中最多的生物", answer:"✅"},
+  {type:"生物",name:"旅鼠", question:"繁殖能力最強", answer:"✅"},
+  {type:"生物",name:"禿鷹", question:"美國的國鳥", answer:"✅"},
+  {type:"生物",name:"蚯蚓", question:"雌雄同體", answer:"✅"},
+  {type:"生物",name:"蝙蝠", question:"是唯一會飛的哺乳動物", answer:"✅"},
+  {type:"生物",name:"藍鯨", question:"世界上最大的哺乳動物", answer:"✅"},
+  {type:"生物",name:"浦普蒲公英", question:"風力", answer:"✅"},
+
+  {type:"醫學",name:"胰島素", question:"可以降低血壓。", answer:"✅"},
+  {type:"醫學",name:"三高", question:"指的是高血脂、高血壓、高血糖。", answer:"✅"},
+  {type:"醫學",name:"肝臟", question:"人體最大的解毒器官是", answer:"✅"},
+  {type:"醫學",name:"真核細胞", question:"有染色體", answer:"✅"},
+  {type:"醫學",name:"缺鉀會導致", question:"甲狀腺疾病", answer:"❌"},
+  {type:"醫學",name:"多曬太陽", question:"可治療白化病", answer:"❌"},
+
+  {type:"海",name:"太平洋", question:"地球第一大洋。", answer:"✅"},
+  {type:"海",name:"太平洋", question:"世界上島嶼最多的海洋", answer:"✅"},
+  {type:"海",name:"瑪律馬拉海", question:"世界最小的海", answer:"✅"},
+  {type:"海",name:"死海", question:"是世界上最低的湖泊", answer:"✅"},
+  {type:"海",name:"北海", question:"世界上最大的海。", answer:"❌"},
+  {type:"海",name:"多瑙河", question:"世界上最長的河流", answer:"❌"},
+  {type:"海",name:"蘇伊士運河", question:"屬於瑞士", answer:"❌"},
+
+  {type:"食物",name:"世界3大飲料", question:"茶、咖啡和可樂", answer:"❌"},
+  {type:"食物",name:"咖啡", question:"有一個品種", answer:"❌"},
+  {type:"食物",name:"巧克力", question:"發源義大利", answer:"❌"},
+  {type:"食物",name:"肯德基", question:"上校軍銜", answer:"✅"},
+  {type:"食物",name:"咖啡", question:"起源於埃塞俄比亞", answer:"✅"},
+
+  {type:"神話",name:"波賽頓", question:"希臘神話-戰神", answer:"❌"},
+  {type:"神話",name:"雅典娜", question:"愛神", answer:"❌"},
+
+  {type:"地科",name:"木星", question:"太陽系中最大的行星", answer:"✅"},
+  {type:"地科",name:"土星的", question:"密度比水小", answer:"✅"},
+  {type:"地科",name:"琥珀", question:"屬於有機寶石", answer:"✅"},
+  {type:"地科",name:"真空", question:"中無法傳遞聲音", answer:"✅"},
+  {type:"地科",name:"目前地球上已知的最大隕石坑位於", question:"南極洲", answer:"❌"},
+
+  {type:"其他",name:"NBA歷史上最高的個人單場得分記錄", question:"是120分", answer:"❌"},
+  {type:"遊戲",name:"神木鎮", question:"地圖1-35級", answer:"❌"},
+  {type:"遊戲",name:"日陽森林", question:"地圖50-65級", answer:"❌"},
+  {type:"其他",name:"塑膠瓶", question:"海裡存在永久", answer:"❌"},
+
+  {type:"國家",name:"2000年夏季奧運會", question:"在悉尼舉行的", answer:"✅"},
+  {type:"國家",name:"《馬賽曲》", question:"法國國歌", answer:"✅"},
+  {type:"國家",name:"美國", question:"籃球運動", answer:"✅"},
+  {type:"國家",name:"英國國歌", question:"《天佑女王》", answer:"✅"},
+  {type:"國家",name:"義大利的", question:"佛羅倫斯", answer:"✅"},
+  {type:"國家",name:"韓國品牌", question:"LG", answer:"✅"},
+  {type:"國家",name:"五線譜", question:"法國人發明", answer:"❌"},
+  {type:"國家",name:"比薩斜塔", question:"澳大利亞地標之一", answer:"❌"},
+  {type:"國家",name:"唐朝在隋朝前。", question:"", answer:"❌"},
+  {type:"國家",name:"美國發射了世界上第一顆", question:"人造衛星", answer:"❌"},
+  {type:"國家",name:"英國國歌", question:"《星光燦爛的旗幟》", answer:"❌"},
+
+  {type:"地理",name:"中國是全球領土面積", question:"最大的國家", answer:"❌"},
+  {type:"地理",name:"喬戈裡峰", question:"是世界第三大高峰", answer:"❌"},
+  {type:"地理",name:"塔克拉瑪幹沙漠", question:"位於新疆南部", answer:"✅"},
+  {type:"地理",name:"安地斯山脈", question:"世界上最長的山脈", answer:"✅"},
+  {type:"地理",name:"干城章嘉峰", question:"是世界第三大高峰", answer:"✅"},
+
+  {type:"花",name:"牡丹", question:"是中國的國花", answer:"✅"},
+  {type:"花",name:"木槿", question:"是韓國的國花", answer:"✅"},
+  {type:"花",name:"鬱金香", question:"是荷蘭的國花", answer:"✅"},
+  {type:"花",name:"蒲公英", question:"靠風力傳播種子", answer:"✅"}
+];
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let wrongQuestions = [];
+
+// 洗牌演算法（隨機打亂題目順序）
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 開始測驗
+function startQuiz(isRetryWrong) {
+  if (isRetryWrong && wrongQuestions.length > 0) {
+    currentQuestions = shuffleArray(wrongQuestions);
+  } else {
+    const category = document.getElementById("categorySelect").value;
+    const count = parseInt(document.getElementById("countSelect").value, 10);
+
+    let filtered = category === "all" 
+      ? quizData 
+      : quizData.filter(q => q.type === category);
+
+    currentQuestions = shuffleArray(filtered).slice(0, count);
+  }
+
+  currentIndex = 0;
+  score = 0;
+  wrongQuestions = [];
+
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("quizScreen").classList.remove("hidden");
+
+  renderQuestion();
+}
+
+// 顯示當前題目
+function renderQuestion() {
+  const q = currentQuestions[currentIndex];
+  const total = currentQuestions.length;
+
+  document.getElementById("progressText").textContent = `第 ${currentIndex + 1} / ${total} 題`;
+  document.getElementById("categoryBadge").textContent = q.type || "綜合";
+  document.getElementById("progressBar").style.width = `${((currentIndex) / total) * 100}%`;
+
+  document.getElementById("qName").textContent = q.name;
+  document.getElementById("qText").textContent = q.question;
+
+  // 重置按鈕與回饋狀態
+  document.getElementById("btnTrue").disabled = false;
+  document.getElementById("btnFalse").disabled = false;
+  document.getElementById("feedbackBox").classList.add("hidden");
+  document.getElementById("nextBtn").classList.add("hidden");
+}
+
+// 提交答案
+function submitAnswer(userChoice) {
+  const q = currentQuestions[currentIndex];
+  const isCorrect = (userChoice === q.answer);
+
+  document.getElementById("btnTrue").disabled = true;
+  document.getElementById("btnFalse").disabled = true;
+
+  const fbBox = document.getElementById("feedbackBox");
+  fbBox.classList.remove("hidden", "fb-correct", "fb-wrong");
+
+  if (isCorrect) {
+    score++;
+    fbBox.classList.add("fb-correct");
+    fbBox.textContent = `🎉 答對了！正確答案就是 ${q.answer}`;
+  } else {
+    wrongQuestions.push(q);
+    fbBox.classList.add("fb-wrong");
+    fbBox.textContent = `❌ 答錯囉！正確答案應該是 ${q.answer}`;
+  }
+
+  document.getElementById("progressBar").style.width = `${((currentIndex + 1) / currentQuestions.length) * 100}%`;
+  
+  const nextBtn = document.getElementById("nextBtn");
+  nextBtn.textContent = (currentIndex === currentQuestions.length - 1) ? "查看測驗結果 ➔" : "下一題 ➔";
+  nextBtn.classList.remove("hidden");
+}
+
+// 切換下一題或進入結算
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < currentQuestions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+// 顯示結算與錯題
+function showResult() {
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+
+  const total = currentQuestions.length;
+  const finalScore = Math.round((score / total) * 100);
+
+  document.getElementById("scoreText").textContent = `${finalScore} 分`;
+  document.getElementById("detailText").textContent = `共 ${total} 題，答對 ${score} 題，答錯 ${wrongQuestions.length} 題`;
+
+  const wrongSection = document.getElementById("wrongSection");
+  const wrongContainer = document.getElementById("wrongListContainer");
+  const retryBtn = document.getElementById("retryWrongBtn");
+
+  wrongContainer.innerHTML = "";
+
+  if (wrongQuestions.length > 0) {
+    wrongSection.classList.remove("hidden");
+    retryBtn.classList.remove("hidden");
+
+    wrongQuestions.forEach(q => {
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<strong>${q.name}</strong> ${q.question} <span style="float:right; font-weight:bold;">正解：${q.answer}</span>`;
+      wrongContainer.appendChild(div);
+    });
+  } else {
+    wrongSection.classList.add("hidden");
+    retryBtn.classList.add("hidden");
+  }
+}
+
+// 返回設定畫面
+function resetToSetup() {
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("setupScreen").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
