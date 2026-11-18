@@ -224,7 +224,7 @@ body{
 	<button onclick="setType('國家')">國家</button>
 	<button onclick="setType('地理')">地理</button>
 	<button onclick="setType('花')">花</button>
-
+	<button onclick="setType('未分類')">未分類</button>
 
 	<button onclick="setType('')">空白</button>
 
@@ -330,7 +330,7 @@ const quizData = [
 		{type:"人名",name:"姬昌", question:"《週易》", answer:"✅"},
 		{type:"人名",name:"莎士比亞", question:"《哈姆雷特》", answer:"✅"},
 		{type:"人名",name:"梵谷", question:"《星月夜》", answer:"✅"},
-		{type:"人名",name:"萊特兄弟", question:"飛機發明者", answer:"✅"},
+		{type:"人名",name:"美國萊特兄弟發明", question:"飛機發明者", answer:"✅"},
 		{type:"人名",name:"達利", question:"是著名的西班牙畫家超現實主義作品而聞名", answer:"✅"},
 		{type:"人名",name:"蕭邦", question:"波蘭著名鋼琴家", answer:"✅"},
 		{type:"人名",name:"塞尚", question:"現代藝術之父", answer:"✅"},
@@ -348,6 +348,8 @@ const quizData = [
 		{type:"人名",name:"杉田智和", question:"職業是演員", answer:"❌"},
 		{type:"人名",name:"《荷馬史詩》", question:"以特洛伊戰爭為背景的", answer:"✅"},
 		{type:"人名",name:"《盜夢空間》", question:"由萊昂納多·迪卡普里奥(LeonardoDiCaprio)主演的電影", answer:"✅"},
+        {type:"人名",name:"哥白尼提出", question:"地心說", answer:"❌"},
+
 	
 		{type:"化學",name:"鋁", question:"地殼含量最多的金屬元素", answer:"✅"},
 		{type:"化學",name:"鋨", question:"密度最大的金屬", answer:"✅"},
@@ -409,7 +411,7 @@ const quizData = [
 		{type:"地科",name:"真空", question:"中無法傳遞聲音", answer:"✅"},
 		{type:"地科",name:"目前地球上已知的最大隕石坑位於", question:"南極洲", answer:"❌"},
 
-    	{name:"NBA歷史上最高的個人單場得分記錄", question:"是120分", answer:"❌"},
+    	{type:"未分類",name:"NBA歷史上最高的個人單場得分記錄", question:"是120分", answer:"❌"},
 	
 		{name:"神木鎮", question:"地圖1-35級", answer:"❌"},
 		{name:"日陽森林", question:"地圖50-65級", answer:"❌"},
@@ -438,7 +440,7 @@ const quizData = [
 		{type:"花",name:"鬱金香", question:"是荷蘭的國花", answer:"✅"},
 		{type:"花",name:"蒲公英", question:"靠風力傳播種子", answer:"✅"},
 
-		{name:"塑膠瓶", question:"海裡存在永久", answer:"❌"}
+		{type:"未分類",name:"塑膠瓶", question:"海裡存在永久", answer:"❌"}
 
 
 ];
