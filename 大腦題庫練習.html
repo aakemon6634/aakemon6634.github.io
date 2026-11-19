@@ -402,7 +402,20 @@ select {
     </div>
   </div>
 </div>
+	<div id="secretStats" style="display: none; text-align: center; background: #1e293b; color: #f8fafc; padding: 10px; border-radius: 8px; font-size: 14px; margin: 20px auto; max-width: 500px;">
+  🔒 管理員專屬統計｜
+  總瀏覽：<span id="busuanzi_value_site_pv">...</span> 次 ｜ 
+  總訪客：<span id="busuanzi_value_site_uv">...</span> 人
+</div>
+	<script defer src="https://vercount.one"></script>
 <script>
+  // 檢查網址是否包含 "?admin=1" 這個暗號
+  if (window.location.search.includes('admin=1')) {
+    document.getElementById('secretStats').style.display = 'block';
+  }
+</script>
+<script>
+	
 const quizData = [
 		{type:"npc",name:"拉魯", question:"奪寶奇兵", answer:"✅"},
 		{type:"npc",name:"芭芭拉", question:"聖徒導師", answer:"✅"},
